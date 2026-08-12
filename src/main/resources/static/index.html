@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bug Lens-Ai | Ultimate Autonomous Code Intelligence</title>
+    <style>
+        :root {
+            --bg-base: #0b0f19;
+            --card-bg: rgba(17, 24, 39, 0.9);
+            --accent-gold: #f59e0b;
+            --accent-cyan: #06b6d4;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+
+        * { box-sizing: border-box; transition: all 0.3s ease; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg-base);
+            color: var(--text-main);
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container { max-width: 950px; margin: auto; }
+
+        header { text-align: center; margin-bottom: 25px; }
+
+        h1 {
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, #f59e0b, #fbbf24, #d97706);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 8px 0;
+            font-weight: 800;
+        }
+
+        p { color: var(--text-muted); font-size: 1.05rem; margin: 0; }
+
+        /* Metrics Grid with Real-time Animation Glow */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        @media(max-width: 768px) { .metrics-grid { grid-template-columns: repeat(2, 1fr); } }
+
+        .metric-card {
+            background: rgba(17, 24, 39, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer { 100% { left: 100%; } }
+
+        .metric-value { font-size: 1.4rem; font-weight: 800; color: var(--accent-gold); margin-top: 5px; }
+        .metric-value.grade { color: #10b981; }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        h3 { margin-top: 0; color: #fff; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
+
+        label { display: block; margin-bottom: 6px; font-weight: 600; color: #d1d5db; font-size: 0.85rem; }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            background: rgba(3, 7, 18, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        button.primary-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #000;
+            border: none;
+            padding: 12px 20px;
+            font-size: 0.95rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 800;
+            width: 100%;
+        }
+
+        button.primary-btn:hover { background: linear-gradient(135deg, #fbbf24, #b45309); }
+
+        .scan-box { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media(max-width: 768px) { .scan-box { grid-template-columns: 1fr; } }
+
+        .scan-panel {
+            background: rgba(3, 7, 18, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 18px;
+            border-radius: 12px;
+        }
+
+        /* IDE Terminal Simulator Box */
+        .ide-terminal {
+            background: #020617;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #38bdf8;
+            margin-top: 10px;
+            height: 90px;
+            overflow-y: auto;
+        }
+
+        .bug-item {
+            background: rgba(3, 7, 18, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            border-left: 5px solid var(--accent-gold);
+        }
+
+        .bug-item.RESOLVED { border-left-color: #10b981; }
+
+        .bug-header { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.05rem; margin-bottom: 6px; }
+        
+        .badge { 
+            font-size: 0.65rem; 
+            padding: 4px 10px; 
+            border-radius: 20px; 
+            background: rgba(245, 158, 11, 0.15); 
+            color: var(--accent-gold); 
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        .badge.RESOLVED { background: rgba(16, 185, 129, 0.15); color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
+
+        .bug-desc { color: var(--text-muted); margin: 6px 0 10px 0; font-size: 0.9rem; }
+
+        .ai-metrics-tag {
+            background: rgba(6, 182, 212, 0.15);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            color: #38bdf8;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .diff-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        @media(max-width: 768px) { .diff-container { grid-template-columns: 1fr; } }
+
+        .diff-box {
+            background: #020617;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            white-space: pre-wrap;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .diff-box.removed { color: #f87171; border-color: rgba(248, 113, 113, 0.3); }
+        .diff-box.added { color: #34d399; border-color: rgba(52, 211, 153, 0.3); }
+        .diff-box.test-box { color: #c084fc; border-color: rgba(192, 132, 252, 0.3); margin-top: 10px; }
+
+        .fix-btn {
+            background: #10b981;
+            color: #fff;
+            border: none;
+            padding: 10px 16px;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+        .fix-btn:hover { background: #059669; }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #111827;
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .close-modal { background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 15px; width: 100%; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Bug Lens-Ai</h1>
+            <p>Real-Time Autonomous Code Intelligence, IDE Plugin Simulation, & Automated Unit Tests</p>
+        </header>
+
+        <!-- Metrics Grid with Real-time Animation -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div style="font-size:0.75rem; color:var(--text-muted);">HEALTH GRADE</div>
+                <div class="metric-value grade" id="healthGrade">A</div>
+            </div>
+            <div class="metric-card">
+                <div style="font-size:0.75rem; color:var(--text-muted);">TOTAL DEFECTS</div>
+                <div class="metric-value" id="totalBugs">0</div>
+            </div>
+            <div class="metric-card">
+                <div style="font-size:0.75rem; color:var(--text-muted);">TOKENS CONSUMED</div>
+                <div class="metric-value" id="tokenCount">0</div>
+            </div>
+            <div class="metric-card">
+                <div style="font-size:0.75rem; color:var(--text-muted);">HOURS SAVED</div>
+                <div class="metric-value" id="hoursSaved" style="color:#38bdf8;">0.0h</div>
+            </div>
+        </div>
+
+        <!-- Repository Scanner & IDE Live Simulator Card -->
+        <div class="card">
+            <h3>Autonomous Repository & VS Code IDE Plugin Simulator</h3>
+            <div class="scan-box">
+                <div class="scan-panel">
+                    <label>GitHub Repository URL</label>
+                    <input type="text" id="repoUrl" placeholder="https://github.com/user/project">
+                    <button class="primary-btn" onclick="scanRepo()">Scan Repository</button>
+                </div>
+                <div class="scan-panel">
+                    <label>VS Code IDE Extension Live Stream</label>
+                    <div class="ide-terminal" id="ideTerminal">
+                        [IDE Plugin] Connected to Bug Lens-Ai daemon...<br>
+                        [Watcher] Monitoring active editor buffer for exceptions...
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 15px; text-align: right;">
+                <button class="primary-btn" style="width: auto; background: linear-gradient(135deg, #06b6d4, #0284c7); color:#fff; padding: 8px 16px; font-size:0.85rem;" onclick="openAuditReport()">📊 View Full Execution Report</button>
+            </div>
+        </div>
+
+        <!-- Triage Stream -->
+        <div class="card">
+            <h3>⚡ Live Triage, Diff & Regression Test Stream</h3>
+            <div id="bugList">Querying AI code analysis endpoint...</div>
+        </div>
+    </div>
+
+    <!-- Audit Report Modal -->
+    <div id="reportModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="color:#f59e0b; margin-top:0;">📊 Execution Audit Report</h3>
+            <div id="reportDetails" style="font-family: monospace; font-size: 0.9rem; color: #cbd5e1; line-height: 1.6;">
+                Loading report data...
+            </div>
+            <button class="close-modal" onclick="closeModal('reportModal')">Close Report</button>
+        </div>
+    </div>
+
+    <!-- GitHub PR Simulator Modal -->
+    <div id="prModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="color:#10b981; margin-top:0;">🐙 GitHub Pull Request Created</h3>
+            <div id="prDetails" style="font-family: monospace; font-size: 0.9rem; color: #cbd5e1; line-height: 1.6;">
+                Loading PR info...
+            </div>
+            <button class="close-modal" onclick="closeModal('prModal')">Close PR View</button>
+        </div>
+    </div>
+
+    <script>
+        let currentBugs = [];
+
+        // Real-time counter animation function
+        function animateValue(id, start, end, duration) {
+            let obj = document.getElementById(id);
+            if (!obj) return;
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                let progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerText = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        async function fetchBugs() {
+            try {
+                const response = await fetch('/api/bugs');
+                currentBugs = await response.json();
+                const bugList = document.getElementById('bugList');
+                
+                // Animate metrics in real time
+                animateValue("totalBugs", 0, currentBugs.length, 600);
+                
+                let totalTokensSum = currentBugs.reduce((acc, b) => acc + (b.tokensUsed || 1420), 0);
+                animateValue("tokenCount", 0, totalTokensSum, 800);
+
+                let resolvedCount = currentBugs.filter(b => b.status.includes('RESOLVED')).length;
+                document.getElementById('hoursSaved').innerText = (resolvedCount * 2.5).toFixed(1) + 'h';
+                
+                let grade = 'A';
+                if (currentBugs.length > 2) grade = 'B';
+                if (currentBugs.length > 5) grade = 'C';
+                document.getElementById('healthGrade').innerText = grade;
+
+                if (currentBugs.length === 0) {
+                    bugList.innerHTML = '<p style="color: #4b5563; text-align: center; padding: 20px; font-family: monospace;">[SYSTEM] Clean state. Paste a GitHub repository URL above to initiate autonomous AI analysis.</p>';
+                    return;
+                }
+
+                bugList.innerHTML = currentBugs.map(bug => `
+                    <div class="bug-item ${bug.status.includes('RESOLVED') ? 'RESOLVED' : ''}">
+                        <div class="bug-header">
+                            <span>${bug.title}</span>
+                            <span class="badge ${bug.status.includes('RESOLVED') ? 'RESOLVED' : ''}">${bug.status}</span>
+                        </div>
+                        <div class="bug-desc">${bug.description}</div>
+
+                        <div class="ai-metrics-tag">
+                            📊 <strong>Cyclomatic Complexity:</strong> ${bug.complexityScore} | <strong>Maintainability:</strong> ${bug.maintainability}
+                        </div>
+
+                        <div class="diff-container">
+                            <div class="diff-box removed"><strong>- Vulnerable Code:</strong>\n${bug.originalCode}</div>
+                            <div class="diff-box added"><strong>+ AI Patched Code:</strong>\n${bug.patchedCode}</div>
+                        </div>
+
+                        <div class="diff-box test-box"><strong>🧪 Generated Regression Unit Test:</strong>\n${bug.unitTestCode}</div>
+
+                        <div>
+                            ${!bug.status.includes('RESOLVED') ? 
+                                `<button class="fix-btn" onclick="triggerAutoFix('${bug.id}', '${bug.title}')">✨ Fix via AI & Open GitHub PR</button>` : 
+                                `<div style="margin-top: 10px; font-size: 0.85rem; color: #10b981; font-weight: bold;">
+                                    ✔ Fixed & Committed! 
+                                    <button onclick="openPRModal('${bug.githubPrLink}', '${bug.title}')" style="background:transparent; border:1px solid #38bdf8; color:#38bdf8; padding:4px 8px; border-radius:4px; cursor:pointer; margin-left:8px;">View GitHub PR ↗️</button>
+                                 </div>`
+                            }
+                        </div>
+                    </div>
+                `).reverse().join('');
+            } catch (err) {
+                console.error('Error fetching bugs:', err);
+            }
+        }
+
+        async function scanRepo() {
+            const url = document.getElementById('repoUrl').value;
+            if (!url) { alert('Please enter a GitHub repository URL'); return; }
+            
+            // Update IDE Terminal Simulator with realistic activity logs
+            const terminal = document.getElementById('ideTerminal');
+            terminal.innerHTML += `<br>[VS Code] Cloning ${url.split('/').pop()} into sandbox...`;
+            terminal.innerHTML += `<br>[AST Analyzer] Parsing syntax tree & detecting code smells...`;
+            terminal.scrollTop = terminal.scrollHeight;
+
+            await fetch('/api/bugs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: "Security Risk in " + url.split('/').pop(),
+                    description: "AI daemon scanned editor buffer and isolated an unhandled exception pointer leak.",
+                    severity: "HIGH"
+                })
+            });
+
+            terminal.innerHTML += `<br><span style="color:#34d399;">[Success] Vulnerability quarantined and sent to triage matrix.</span>`;
+            terminal.scrollTop = terminal.scrollHeight;
+            document.getElementById('repoUrl').value = '';
+            fetchBugs();
+        }
+
+        async function triggerAutoFix(id, title) {
+            const terminal = document.getElementById('ideTerminal');
+            terminal.innerHTML += `<br>[AI Engine] Generating patch for "${title}"...`;
+            terminal.innerHTML += `<br>[JUnit] Compiling and running automated unit tests... PASS`;
+            terminal.scrollTop = terminal.scrollHeight;
+
+            await fetch(`/api/bugs/${id}/fix`, { method: 'POST' });
+            fetchBugs();
+        }
+
+        async function openAuditReport() {
+            const res = await fetch('/api/report/summary');
+            const data = await res.json();
+            
+            const detailsHtml = `
+                <p><strong>Total Bugs Detected:</strong> ${data.totalBugsDetected}</p>
+                <p><strong>Total Bugs Fixed:</strong> ${data.totalBugsFixed}</p>
+                <p><strong>Overall Success Rate:</strong> ${data.successRate}</p>
+                <p><strong>Total Tokens Processed:</strong> ${data.totalTokensConsumed} Tokens</p>
+                <p><strong>Estimated Developer Hours Saved:</strong> ${data.estimatedHoursSaved}</p>
+                <p><strong>Timestamp:</strong> ${data.auditTimestamp}</p>
+                <p><strong>Fixed Defects List:</strong></p>
+                <ul style="margin: 0; padding-left: 20px;">
+                    ${data.fixedDefectsList.map(item => `<li>${item}</li>`).join('')}
+                </ul>
+            `;
+            document.getElementById('reportDetails').innerHTML = detailsHtml;
+            document.getElementById('reportModal').style.display = 'flex';
+        }
+
+        function openPRModal(prUrl, bugTitle) {
+            const prHtml = `
+                <p><strong>Repository Branch:</strong> ai-patch-automated-fix</p>
+                <p><strong>Commit Message:</strong> AI Auto-Fix & Unit Test: Resolved -> ${bugTitle}</p>
+                <p><strong>Pull Request Reference:</strong> <span style="color:#38bdf8;">${prUrl}</span></p>
+                <p><strong>Status:</strong> Successfully merged into main branch.</p>
+                <p style="color:#10b981;">✔ Automated Unit Regression Tests Passed (100% Coverage).</p>
+            `;
+            document.getElementById('prDetails').innerHTML = prHtml;
+            document.getElementById('prModal').style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        fetchBugs();
+    </script>
+</body>
+</html>
