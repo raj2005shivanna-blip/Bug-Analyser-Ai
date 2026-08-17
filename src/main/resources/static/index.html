@@ -974,19 +974,26 @@
                         <!-- LIVE FIX TRACKER PIPELINE -->
                         <div class="tracker-pipeline">
                             <div class="tracker-step completed">Detection<br><span style="color:#94a3b8; font-weight:normal;">Verified</span></div>
-                            <div class="tracker-step completed">Location<br><span style="color:#94a3b8; font-weight:normal; font-size:0.6rem;">${bug.fileLocation ? bug.fileLocation.split('/').pop() : 'Unknown'}:${bug.lineNumber || '?'}</span></div>
+                            <div class="tracker-step completed">Location<br><span style="color:#38bdf8; font-weight:bold; font-size:0.7rem;">${bug.fileLocation ? bug.fileLocation.split('/').pop() : 'Unknown.java'} : Line ${bug.lineNumber || 'Unknown'}</span></div>
                             <div class="tracker-step completed">Root Cause<br><span style="color:#94a3b8; font-weight:normal; font-size:0.6rem;">${bug.rootCause || 'Identified'}</span></div>
                             <div class="tracker-step ${bug.status.includes('RESOLVED') ? 'completed' : 'active'}">Fix<br><span style="color:#94a3b8; font-weight:normal;">Generated</span></div>
                             <div class="tracker-step ${bug.status.includes('RESOLVED') ? 'completed' : ''}">Patch<br><span style="color:#94a3b8; font-weight:normal;">Applied</span></div>
                             <div class="tracker-step ${bug.status.includes('RESOLVED') ? 'verified' : ''}">Tests<br><span style="color:#94a3b8; font-weight:normal;">${bug.status.includes('RESOLVED') ? 'Passed' : 'Pending'}</span></div>
                         </div>
 
-                        <div class="diff-container">
-                            <div class="diff-box removed"><strong>- Vulnerable Code:</strong>\n${bug.originalCode}</div>
-                            <div class="diff-box added"><strong>+ AI Patched Code:</strong>\n${bug.patchedCode}</div>
+                        <div class="diff-container" style="margin-top: 15px; border: 1px solid #334155; border-radius: 8px; overflow: hidden;">
+                            <div style="background: rgba(248, 113, 113, 0.1); padding: 10px; border-bottom: 1px solid #334155;">
+                                <strong style="color: #f87171;">🔴 BEFORE FIXING (Vulnerable Code):</strong>
+                            </div>
+                            <div class="diff-box removed" style="margin: 0; border: none; border-radius: 0;">${bug.originalCode}</div>
+                            
+                            <div style="background: rgba(16, 185, 129, 0.1); padding: 10px; border-top: 1px solid #334155; border-bottom: 1px solid #334155;">
+                                <strong style="color: #10b981;">🟢 AFTER FIXING (AI Patched Code):</strong>
+                            </div>
+                            <div class="diff-box added" style="margin: 0; border: none; border-radius: 0;">${bug.patchedCode}</div>
                         </div>
 
-                        <div class="diff-box test-box"><strong>🧪 Generated Regression Unit Test:</strong>\n${bug.unitTestCode}</div>
+                        <div class="diff-box test-box" style="margin-top: 15px;"><strong>🧪 Generated Regression Unit Test:</strong>\n${bug.unitTestCode}</div>
 
                         <div>
                             ${!bug.status.includes('RESOLVED') ? 

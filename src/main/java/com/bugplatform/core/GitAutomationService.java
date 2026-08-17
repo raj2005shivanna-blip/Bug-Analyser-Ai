@@ -350,6 +350,15 @@ public class GitAutomationService {
                 NullLiteralExpr firstNull = nullExprs.get(0);
                 if (firstNull.getRange().isPresent()) {
                     extractedLine = String.valueOf(firstNull.getRange().get().begin.line);
+                } else {
+                    // Fallback line search
+                    String[] lines = fileContent.split("\n");
+                    for (int i = 0; i < lines.length; i++) {
+                        if (lines[i].contains("null")) {
+                            extractedLine = String.valueOf(i + 1);
+                            break;
+                        }
+                    }
                 }
                 Optional<com.github.javaparser.ast.body.MethodDeclaration> methodOpt = firstNull.findAncestor(com.github.javaparser.ast.body.MethodDeclaration.class);
                 if (methodOpt.isPresent()) {
