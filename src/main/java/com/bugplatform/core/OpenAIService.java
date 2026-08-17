@@ -19,7 +19,9 @@ public class OpenAIService {
     }
 
     public Map<String, String> classifyBugDomain(String title, String description) {
-        String combined = (title + " " + description).toLowerCase();
+        String safeTitle = title != null ? title : "";
+        String safeDesc = description != null ? description : "";
+        String combined = (safeTitle + " " + safeDesc).toLowerCase();
         
         String primaryDomain = "Backend";
         String component = "Core API";

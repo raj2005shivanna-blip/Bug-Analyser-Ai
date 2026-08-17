@@ -38,6 +38,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
+@SuppressWarnings("unchecked")
 public class GitAutomationService {
     private final BugRepository bugRepository;
     private final SimpMessagingTemplate messagingTemplate;

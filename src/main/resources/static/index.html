@@ -726,6 +726,63 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Phase 3: Model Evaluation & Benchmarking Dashboard -->
+            <div class="card" id="evaluationDashboardCard" style="margin-top: 30px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3>🧪 Bug Analysis Accuracy & Model Evaluation</h3>
+                    <button class="primary-btn" style="width: auto; background: linear-gradient(135deg, #f43f5e, #e11d48); padding: 8px 16px; font-size:0.85rem;" onclick="runModelEvaluation()">▶️ Run Benchmark Evaluation</button>
+                </div>
+                <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px;">Evaluate the active AI engine against a labelled ground-truth test suite to calculate real performance metrics.</p>
+                
+                <div id="evalLoading" style="display: none; text-align: center; color: #38bdf8; margin: 20px 0;">Running deterministic AST analysis across test dataset...</div>
+                
+                <div id="evalResults" style="display: none;">
+                    <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                        <div class="scan-panel" style="flex: 1; text-align: center;">
+                            <h4 style="color: #94a3b8; margin: 0;">Accuracy</h4>
+                            <div id="evalAccuracy" style="font-size: 1.5rem; color: #10b981; font-weight: bold;">--</div>
+                        </div>
+                        <div class="scan-panel" style="flex: 1; text-align: center;">
+                            <h4 style="color: #94a3b8; margin: 0;">Precision</h4>
+                            <div id="evalPrecision" style="font-size: 1.5rem; color: #38bdf8; font-weight: bold;">--</div>
+                        </div>
+                        <div class="scan-panel" style="flex: 1; text-align: center;">
+                            <h4 style="color: #94a3b8; margin: 0;">Recall</h4>
+                            <div id="evalRecall" style="font-size: 1.5rem; color: #f59e0b; font-weight: bold;">--</div>
+                        </div>
+                        <div class="scan-panel" style="flex: 1; text-align: center;">
+                            <h4 style="color: #94a3b8; margin: 0;">F1-Score</h4>
+                            <div id="evalF1Score" style="font-size: 1.5rem; color: #a855f7; font-weight: bold;">--</div>
+                        </div>
+                    </div>
+
+                    <div class="scan-box" style="margin-bottom: 20px;">
+                        <div class="scan-panel" style="flex: 1;">
+                            <h4 style="text-align: center;">Confusion Matrix</h4>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; text-align: center; color: #fff; margin-top: 15px;">
+                                <div></div>
+                                <div style="color: #94a3b8; font-size: 0.8rem;">Predicted Positive</div>
+                                <div style="color: #94a3b8; font-size: 0.8rem;">Predicted Negative</div>
+                                
+                                <div style="color: #94a3b8; font-size: 0.8rem; display: flex; align-items: center; justify-content: center;">Actual Positive</div>
+                                <div id="cmTP" style="background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; padding: 15px; border-radius: 4px;">TP: --</div>
+                                <div id="cmFN" style="background: rgba(244, 63, 94, 0.2); border: 1px solid #f43f5e; padding: 15px; border-radius: 4px;">FN: --</div>
+                                
+                                <div style="color: #94a3b8; font-size: 0.8rem; display: flex; align-items: center; justify-content: center;">Actual Negative</div>
+                                <div id="cmFP" style="background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; padding: 15px; border-radius: 4px;">FP: --</div>
+                                <div id="cmTN" style="background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; padding: 15px; border-radius: 4px;">TN: --</div>
+                            </div>
+                            <div style="text-align: center; margin-top: 15px; font-size: 0.8rem; color: #94a3b8;">
+                                <span id="evalDatasetInfo">Dataset Size: -- | Version: --</span>
+                            </div>
+                        </div>
+                        <div class="scan-panel" style="flex: 1;">
+                            <canvas id="evalMetricsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1375,6 +1432,72 @@
                     plugins: { 
                         legend: { position: 'right', labels: { color: '#cbd5e1' } },
                         title: { display: true, text: 'Code Location Hotspots', color: '#fff' }
+                    }
+                }
+            });
+        }
+
+        // --- MODEL EVALUATION DASHBOARD LOGIC ---
+        let evalMetricsChartInstance = null;
+        
+        async function runModelEvaluation() {
+            document.getElementById('evalLoading').style.display = 'block';
+            document.getElementById('evalResults').style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/evaluate?version=v2.1.0-beta');
+                const metrics = await response.json();
+                
+                document.getElementById('evalLoading').style.display = 'none';
+                document.getElementById('evalResults').style.display = 'block';
+                
+                // Populate KPIs
+                document.getElementById('evalAccuracy').innerText = metrics.accuracy + '%';
+                document.getElementById('evalPrecision').innerText = metrics.precision + '%';
+                document.getElementById('evalRecall').innerText = metrics.recall + '%';
+                document.getElementById('evalF1Score').innerText = metrics.f1Score + '%';
+                
+                // Populate Confusion Matrix
+                document.getElementById('cmTP').innerText = 'TP: ' + metrics.truePositives;
+                document.getElementById('cmFN').innerText = 'FN: ' + metrics.falseNegatives;
+                document.getElementById('cmFP').innerText = 'FP: ' + metrics.falsePositives;
+                document.getElementById('cmTN').innerText = 'TN: ' + metrics.trueNegatives;
+                
+                document.getElementById('evalDatasetInfo').innerText = `Dataset Size: ${metrics.datasetSize} cases | Evaluated: ${new Date(metrics.evaluationDate).toLocaleString()}`;
+                
+                // Render Chart
+                renderEvalMetricsChart(metrics);
+            } catch (err) {
+                console.error(err);
+                document.getElementById('evalLoading').innerText = 'Error running evaluation.';
+            }
+        }
+        
+        function renderEvalMetricsChart(metrics) {
+            const ctx = document.getElementById('evalMetricsChart').getContext('2d');
+            if(evalMetricsChartInstance) evalMetricsChartInstance.destroy();
+            
+            evalMetricsChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['File Localization', 'Line Localization', 'Fix Success Rate', 'Regression Rate'],
+                    datasets: [{
+                        label: 'Performance (%)',
+                        data: [metrics.fileLocalizationAcc, metrics.lineLocalizationAcc, metrics.fixSuccessPercentage, metrics.regressionRate],
+                        backgroundColor: ['#3b82f6', '#06b6d4', '#10b981', '#f43f5e'],
+                        borderWidth: 0,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true, max: 100, ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        x: { ticks: { color: '#cbd5e1' }, grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Advanced Diagnostics & Auto-Fix Metrics', color: '#fff' }
                     }
                 }
             });
