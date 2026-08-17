@@ -45,6 +45,14 @@ public class HealthController {
         Map<String, Object> aiMetrics = openAIService.analyzeCodeWithRealAI(savedBug.getOriginalCode());
         savedBug.setComplexityScore((int) aiMetrics.get("cyclomaticComplexity"));
         savedBug.setMaintainability((String) aiMetrics.get("maintainabilityIndex"));
+        
+        Map<String, String> classification = openAIService.classifyBugDomain(savedBug.getTitle(), savedBug.getDescription());
+        savedBug.setTechnicalDomain(classification.get("primaryDomain"));
+        savedBug.setComponentName(classification.get("component"));
+        savedBug.setSecondaryDomain(classification.get("secondaryDomain"));
+        savedBug.setDomainConfidence(classification.get("confidence"));
+        savedBug.setDomainReasoning(classification.get("reasoning"));
+        
         return bugRepository.save(savedBug);
     }
 
@@ -56,6 +64,7 @@ public class HealthController {
         
         bug.setStatus("RESOLVED & PR MERGED");
         bug.setGithubPrLink(prDetails.get("pullRequestUrl"));
+        bug.setResolvedAt(java.time.LocalDateTime.now().toString());
         return bugRepository.save(bug);
     }
 

@@ -14,7 +14,7 @@
 	<name>bug-analyzer-backend</name>
 	<description>Intelligent Bug Report Analysis System</description>
 	<properties>
-		<java.version>21</java.version>
+		<java.version>17</java.version>
 	</properties>
 	<dependencies>
 		<dependency>

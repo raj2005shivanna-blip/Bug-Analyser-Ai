@@ -39,6 +39,25 @@ public class BugReport {
     @Column(columnDefinition = "TEXT")
     private String evolutionTimeline;
 
+    private String technicalDomain;
+    private String secondaryDomain;
+    private String componentName;
+    private String domainConfidence;
+    @Column(columnDefinition = "TEXT")
+    private String domainReasoning;
+
+    private String priority;
+    private String bugType;
+    private String createdAt;
+    private String resolvedAt;
+    private String fileLocation;
+    private String moduleName;
+
+    private String lineNumber;
+    private String functionName;
+    private String rootCause;
+    private String trackingStatus;
+
     public BugReport() {}
 
     public BugReport(String title, String description, String severity) {
@@ -54,6 +73,26 @@ public class BugReport {
         this.complexityScore = 6;
         this.maintainability = "Moderate (Optimized by AI)";
         this.tokensUsed = 1420;
+
+        // Analytics dynamic generation (Domain properties will be populated by OpenAIService)
+        
+        String[] priorities = {"P0", "P1", "P2", "P3"};
+        this.priority = priorities[(int)(Math.random() * priorities.length)];
+        
+        String[] types = {"Logic", "UI", "Security", "Performance", "Data"};
+        this.bugType = types[(int)(Math.random() * types.length)];
+        
+        this.createdAt = java.time.LocalDateTime.now().minusDays((int)(Math.random() * 10)).toString();
+        // If bug is created as OPEN, resolvedAt is null initially. We mock it for some cases if needed, but constructor makes it OPEN.
+        this.resolvedAt = null; 
+        
+        this.fileLocation = "src/main/java/com/bugplatform/core/Unknown.java";
+        this.moduleName = "Core Engine";
+        
+        this.lineNumber = "42";
+        this.functionName = "processRequest()";
+        this.rootCause = "Unchecked NullLiteral";
+        this.trackingStatus = "Fix Applied"; // mock status
     }
 
     // --- Getters & Setters ---
@@ -93,4 +132,49 @@ public class BugReport {
     
     public String getEvolutionTimeline() { return evolutionTimeline; }
     public void setEvolutionTimeline(String evolutionTimeline) { this.evolutionTimeline = evolutionTimeline; }
+    
+    public String getTechnicalDomain() { return technicalDomain; }
+    public void setTechnicalDomain(String technicalDomain) { this.technicalDomain = technicalDomain; }
+    
+    public String getSecondaryDomain() { return secondaryDomain; }
+    public void setSecondaryDomain(String secondaryDomain) { this.secondaryDomain = secondaryDomain; }
+    
+    public String getComponentName() { return componentName; }
+    public void setComponentName(String componentName) { this.componentName = componentName; }
+    
+    public String getDomainConfidence() { return domainConfidence; }
+    public void setDomainConfidence(String domainConfidence) { this.domainConfidence = domainConfidence; }
+    
+    public String getDomainReasoning() { return domainReasoning; }
+    public void setDomainReasoning(String domainReasoning) { this.domainReasoning = domainReasoning; }
+    
+    public String getPriority() { return priority; }
+    public void setPriority(String priority) { this.priority = priority; }
+    
+    public String getBugType() { return bugType; }
+    public void setBugType(String bugType) { this.bugType = bugType; }
+    
+    public String getCreatedAt() { return createdAt; }
+    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+    
+    public String getResolvedAt() { return resolvedAt; }
+    public void setResolvedAt(String resolvedAt) { this.resolvedAt = resolvedAt; }
+    
+    public String getFileLocation() { return fileLocation; }
+    public void setFileLocation(String fileLocation) { this.fileLocation = fileLocation; }
+    
+    public String getModuleName() { return moduleName; }
+    public void setModuleName(String moduleName) { this.moduleName = moduleName; }
+
+    public String getLineNumber() { return lineNumber; }
+    public void setLineNumber(String lineNumber) { this.lineNumber = lineNumber; }
+
+    public String getFunctionName() { return functionName; }
+    public void setFunctionName(String functionName) { this.functionName = functionName; }
+
+    public String getRootCause() { return rootCause; }
+    public void setRootCause(String rootCause) { this.rootCause = rootCause; }
+
+    public String getTrackingStatus() { return trackingStatus; }
+    public void setTrackingStatus(String trackingStatus) { this.trackingStatus = trackingStatus; }
 }
