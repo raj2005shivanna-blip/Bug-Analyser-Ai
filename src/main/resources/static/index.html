@@ -629,8 +629,18 @@
 
             <!-- Triage Stream -->
             <div class="card">
-                <h3>⚡ Live Triage, Diff & Regression Test Stream</h3>
+                <h3>⚡ Live Triage, Diff & Regression Test Stream
+                    <button class="primary-btn" style="width: auto; background: linear-gradient(135deg, #a855f7, #7e22ce); font-size: 0.8rem; padding: 6px 12px;" onclick="mergeDuplicates()">🔄 Smart Deduplicate</button>
+                </h3>
                 <div id="bugList">Querying AI code analysis endpoint...</div>
+            </div>
+
+            <!-- Phase 1: Global AI Analytics Card -->
+            <div class="card" id="globalAnalyticsCard" style="display:none;">
+                <h3>🌍 Global AI Analytics & Predictions</h3>
+                <div class="scan-box" id="globalAnalyticsContent">
+                    <!-- Populated via JS -->
+                </div>
             </div>
         </div>
     </div>
@@ -654,6 +664,28 @@
                 Loading PR info...
             </div>
             <button class="close-modal" onclick="closeModal('prModal')">Close PR View</button>
+        </div>
+    </div>
+
+    <!-- AI Deep Intel Modal -->
+    <div id="intelModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 800px;">
+            <h3 style="color:#a855f7; margin-top:0;">🧠 Deep AI Bug Intelligence</h3>
+            <div id="intelDetails" style="font-family: 'Inter', sans-serif; font-size: 0.95rem; color: #cbd5e1; line-height: 1.6; max-height: 60vh; overflow-y: auto; padding-right: 10px;">
+                Loading AI deep analysis...
+            </div>
+            
+            <!-- Human Feedback Loop (Feature 15) -->
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <h4 style="margin: 0 0 10px 0; color: #38bdf8;">👤 Human Feedback Loop</h4>
+                <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 10px;">Correcting the AI improves future predictions.</p>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="feedbackText" placeholder="e.g. 'The root cause is actually the cache, not the DB.'" style="margin-bottom:0;">
+                    <button class="primary-btn" style="width: auto; white-space: nowrap; margin-bottom:0;" onclick="submitFeedback()">Submit Feedback</button>
+                </div>
+            </div>
+            
+            <button class="close-modal" onclick="closeModal('intelModal')">Close Intel</button>
         </div>
     </div>
 
@@ -799,9 +831,14 @@
                                     <button onclick="openPRModal('${bug.githubPrLink}', '${bug.title}')" style="background:transparent; border:1px solid #38bdf8; color:#38bdf8; padding:4px 8px; border-radius:4px; cursor:pointer; margin-left:8px;">View GitHub PR ↗️</button>
                                  </div>`
                             }
+                            <button onclick="openDeepIntel('${bug.id}')" style="background:transparent; border:1px solid #a855f7; color:#c084fc; padding:10px 16px; border-radius:6px; cursor:pointer; font-weight: 700; margin-top: 10px; margin-left: 10px;">🔍 View Deep AI Intel</button>
                         </div>
                     </div>
                 `).reverse().join('');
+                
+                if (currentBugs.length > 0) {
+                    fetchGlobalAnalytics();
+                }
             } catch (err) {
                 console.error('Error fetching bugs:', err);
             }
@@ -877,6 +914,17 @@
 
         async function triggerAutoFix(id, title) {
             const terminal = document.getElementById('ideTerminal');
+            terminal.innerHTML += `<br>[AI Engine] Simulating Fix-Quality Prediction for "${title}"...`;
+            terminal.scrollTop = terminal.scrollHeight;
+            
+            try {
+                const fqRes = await fetch('/api/advanced/fix-quality', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: "test" })
+                });
+                const fq = await fqRes.json();
+                terminal.innerHTML += `<br><span style="color:#c084fc;">[Fix Prediction] Confidence: ${fq.confidence} - ${fq.explanation}</span>`;
+            } catch(e) {}
+
             terminal.innerHTML += `<br>[AI Engine] Generating patch for "${title}"...`;
             terminal.innerHTML += `<br>[JUnit] Compiling and running automated unit tests... PASS`;
             terminal.scrollTop = terminal.scrollHeight;
@@ -919,6 +967,124 @@
 
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
+        }
+
+        async function fetchGlobalAnalytics() {
+            try {
+                document.getElementById('globalAnalyticsCard').style.display = 'block';
+                const content = document.getElementById('globalAnalyticsContent');
+                content.innerHTML = '<div style="color:#cbd5e1;">Running cluster and hotspot analysis...</div>';
+                
+                const [clusterRes, hotspotRes, riskRes, leakRes, depRes, crossRes] = await Promise.all([
+                    fetch('/api/advanced/clustering').then(r => r.json()),
+                    fetch('/api/advanced/hotspots').then(r => r.json()),
+                    fetch('/api/advanced/release-risk').then(r => r.json()),
+                    fetch('/api/advanced/leakage').then(r => r.json()),
+                    fetch('/api/advanced/dependency-graph').then(r => r.json()),
+                    fetch('/api/advanced/cross-project').then(r => r.json())
+                ]);
+
+                let html = `
+                    <div class="scan-panel">
+                        <h4 style="color:#f59e0b; margin-top:0;">🧩 Bug Clusters</h4>
+                        ${clusterRes.clusters.map(c => `<div style="margin-bottom:8px; font-size:0.9rem;"><strong>${c.topic}</strong>: ${c.bugCount} bugs</div>`).join('')}
+                    </div>
+                    <div class="scan-panel">
+                        <h4 style="color:#ef4444; margin-top:0;">🔥 Hotspot Prediction</h4>
+                        ${hotspotRes.hotspots.map(h => `<div style="margin-bottom:8px; font-size:0.9rem;"><strong>${h.module}</strong> (Risk: ${h.riskScore})<br><span style="color:#94a3b8; font-size:0.8rem;">${h.reason}</span></div>`).join('')}
+                    </div>
+                    <div class="scan-panel">
+                        <h4 style="color:#38bdf8; margin-top:0;">🚀 Release Risk (v Latest)</h4>
+                        <div style="font-size:0.9rem;"><strong>Level:</strong> ${riskRes.riskLevel} (${riskRes.confidence} conf)</div>
+                        <div style="font-size:0.85rem; color:#94a3b8; margin-top:5px;">${riskRes.recommendation}</div>
+                    </div>
+                    <div class="scan-panel">
+                        <h4 style="color:#a855f7; margin-top:0;">🕸️ Cross-Project Learning</h4>
+                        <div style="font-size:0.9rem;"><strong>Insights Gained:</strong> ${crossRes.insightsGained}</div>
+                        <div style="font-size:0.85rem; color:#94a3b8; margin-top:5px;">Patterns: ${crossRes.appliedPatterns.join(', ')}</div>
+                        <div style="font-size:0.8rem; color:#10b981; margin-top:5px;">${crossRes.dataIsolationStatus}</div>
+                    </div>
+                `;
+                content.innerHTML = html;
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        let currentIntelBugId = null;
+        async function openDeepIntel(bugId) {
+            currentIntelBugId = bugId;
+            document.getElementById('intelModal').style.display = 'flex';
+            const details = document.getElementById('intelDetails');
+            details.innerHTML = 'Querying Deep AI Analysis...';
+            
+            try {
+                const [dup, reg, time, imp, exp] = await Promise.all([
+                    fetch('/api/advanced/duplicates/' + bugId).then(r=>r.json()),
+                    fetch('/api/advanced/regression/' + bugId).then(r=>r.json()),
+                    fetch('/api/advanced/timeline/' + bugId).then(r=>r.json()),
+                    fetch('/api/advanced/impact/' + bugId).then(r=>r.json()),
+                    fetch('/api/advanced/explain/' + bugId).then(r=>r.json())
+                ]);
+
+                details.innerHTML = `
+                    <div style="margin-bottom:15px; padding-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <strong style="color:#c084fc;">🤖 AI Confidence & Explanation:</strong><br>
+                        Confidence: <span style="color:#10b981;">${exp.aiConfidence}</span><br>
+                        <span style="font-size:0.85rem; color:#94a3b8;">${exp.aiExplanation}</span>
+                    </div>
+                    <div style="margin-bottom:15px; padding-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <strong style="color:#38bdf8;">🔄 Regression Detection:</strong><br>
+                        ${reg.isRegression ? `<span style="color:#ef4444;">Regression Detected! (Conf: ${reg.confidence})</span><br><span style="font-size:0.85rem; color:#94a3b8;">${reg.explanation}</span>` : 'No regression detected.'}
+                    </div>
+                    <div style="margin-bottom:15px; padding-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <strong style="color:#f59e0b;">♊ Semantic Duplicates:</strong><br>
+                        Similarity: ${dup.semanticSimilarity} (Conf: ${dup.confidence})<br>
+                        <span style="font-size:0.85rem; color:#94a3b8;">${dup.explanation}</span>
+                    </div>
+                    <div style="margin-bottom:15px; padding-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <strong style="color:#10b981;">💥 Impact Analysis:</strong><br>
+                        Affected Users: ${imp.affectedUsers}<br>
+                        Revenue Risk: ${imp.revenueImpactRisk}<br>
+                        Modules: ${imp.dependentModules.join(', ')}
+                    </div>
+                    <div>
+                        <strong style="color:#e2e8f0;">⏳ Evolution Timeline:</strong><br>
+                        <ul style="margin:5px 0 0 0; padding-left:20px; font-size:0.85rem; color:#94a3b8;">
+                            ${time.timeline.map(t => `<li>${t.timestamp}: ${t.event}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            } catch (e) {
+                details.innerHTML = '<span style="color:#ef4444;">Error loading intel.</span>';
+            }
+        }
+
+        async function submitFeedback() {
+            const text = document.getElementById('feedbackText').value;
+            if(!text || !currentIntelBugId) return;
+            
+            await fetch('/api/advanced/feedback/' + currentIntelBugId, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ feedbackText: text })
+            });
+            
+            document.getElementById('feedbackText').value = '';
+            alert('Feedback submitted successfully! AI models updated.');
+        }
+
+        async function mergeDuplicates() {
+            if (currentBugs.length < 2) {
+                alert("Need at least 2 bugs to merge.");
+                return;
+            }
+            const ids = currentBugs.map(b => b.id);
+            const res = await fetch('/api/advanced/deduplicate', {
+                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(ids)
+            });
+            const data = await res.json();
+            alert(`Merged ${data.mergedCount} bugs into primary bug ${data.mergedInto}.\nStatus: ${data.status}`);
+            fetchBugs(); // reload
         }
 
         // Initialize Cyber Bugs on Login
