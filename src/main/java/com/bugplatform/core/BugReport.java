@@ -58,6 +58,12 @@ public class BugReport {
     private String rootCause;
     private String trackingStatus;
 
+    // --- New Project Ecosystem fields ---
+    private String projectLanguages;
+    private String projectFrontendStack;
+    private String projectBackendStack;
+    private String projectAlgorithms;
+
     public BugReport() {}
 
     public BugReport(String title, String description, String severity) {
@@ -177,4 +183,13 @@ public class BugReport {
 
     public String getTrackingStatus() { return trackingStatus; }
     public void setTrackingStatus(String trackingStatus) { this.trackingStatus = trackingStatus; }
+
+    public String getProjectLanguages() { return projectLanguages; }
+    public void setProjectLanguages(String projectLanguages) { this.projectLanguages = projectLanguages; }
+    public String getProjectFrontendStack() { return projectFrontendStack; }
+    public void setProjectFrontendStack(String projectFrontendStack) { this.projectFrontendStack = projectFrontendStack; }
+    public String getProjectBackendStack() { return projectBackendStack; }
+    public void setProjectBackendStack(String projectBackendStack) { this.projectBackendStack = projectBackendStack; }
+    public String getProjectAlgorithms() { return projectAlgorithms; }
+    public void setProjectAlgorithms(String projectAlgorithms) { this.projectAlgorithms = projectAlgorithms; }
 }

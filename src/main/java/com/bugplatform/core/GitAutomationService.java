@@ -296,9 +296,11 @@ public class GitAutomationService {
         try {
             logToClient("[System] Extracting uploaded ZIP file...");
             // 1. Unzip
+            java.util.List<String> extractedFiles = new java.util.ArrayList<>();
             try (ZipInputStream zis = new ZipInputStream(zipFile.getInputStream())) {
                 ZipEntry entry;
                 while ((entry = zis.getNextEntry()) != null) {
+                    extractedFiles.add(entry.getName());
                     File newFile = new File(sandboxDir, entry.getName());
                     if (entry.isDirectory()) {
                         newFile.mkdirs();
@@ -386,6 +388,12 @@ public class GitAutomationService {
             report.setSecondaryDomain(classification.get("secondaryDomain"));
             report.setDomainConfidence(classification.get("confidence"));
             report.setDomainReasoning(classification.get("reasoning"));
+
+            Map<String, String> ecosystem = openAIService.analyzeProjectEcosystem(extractedFiles);
+            report.setProjectLanguages(ecosystem.get("languages"));
+            report.setProjectFrontendStack(ecosystem.get("frontendStack"));
+            report.setProjectBackendStack(ecosystem.get("backendStack"));
+            report.setProjectAlgorithms(ecosystem.get("algorithms"));
 
             report.setOriginalCode(fileContent);
             report.setPatchedCode(patchedContent);

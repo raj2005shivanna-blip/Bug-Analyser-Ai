@@ -64,4 +64,63 @@ public class OpenAIService {
         
         return result;
     }
+
+    public Map<String, String> analyzeProjectEcosystem(java.util.List<String> fileNames) {
+        String languages = "Unknown";
+        String frontendStack = "None Detected";
+        String backendStack = "None Detected";
+        String algorithms = "Standard Operations";
+
+        boolean hasJava = false;
+        boolean hasJs = false;
+        boolean hasPython = false;
+        boolean hasHtml = false;
+        
+        for (String file : fileNames) {
+            String lower = file.toLowerCase();
+            if (lower.endsWith(".java")) hasJava = true;
+            if (lower.endsWith(".js") || lower.endsWith(".ts") || lower.endsWith(".jsx") || lower.endsWith(".tsx")) hasJs = true;
+            if (lower.endsWith(".py")) hasPython = true;
+            if (lower.endsWith(".html") || lower.endsWith(".css")) hasHtml = true;
+            
+            // Detect backend frameworks
+            if (lower.contains("pom.xml") || lower.contains("build.gradle")) {
+                backendStack = "Spring Boot / Java Maven";
+            }
+            if (lower.contains("requirements.txt") || lower.contains("pipfile")) {
+                backendStack = "Django / Flask (Python)";
+            }
+
+            // Detect frontend frameworks
+            if (lower.contains("package.json")) {
+                if (lower.contains("react")) frontendStack = "React.js";
+                else if (lower.contains("angular")) frontendStack = "Angular";
+                else if (lower.contains("vue")) frontendStack = "Vue.js";
+                else frontendStack = "Node.js / NPM Ecosystem";
+            }
+            
+            // Detect Algorithms from file names heuristically
+            if (lower.contains("sort")) algorithms = "Sorting (e.g. QuickSort, MergeSort)";
+            if (lower.contains("search") || lower.contains("find")) algorithms = "Search / Heuristic Pathfinding";
+            if (lower.contains("graph") || lower.contains("tree") || lower.contains("node")) algorithms = "Graph/Tree Traversal";
+        }
+
+        java.util.List<String> langs = new java.util.ArrayList<>();
+        if (hasJava) langs.add("Java");
+        if (hasJs) langs.add("JavaScript/TypeScript");
+        if (hasPython) langs.add("Python");
+        if (hasHtml) langs.add("HTML/CSS");
+        
+        if (!langs.isEmpty()) {
+            languages = String.join(", ", langs);
+        }
+
+        Map<String, String> result = new HashMap<>();
+        result.put("languages", languages);
+        result.put("frontendStack", frontendStack);
+        result.put("backendStack", backendStack);
+        result.put("algorithms", algorithms);
+
+        return result;
+    }
 }
