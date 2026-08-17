@@ -4,60 +4,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bug Lens-Ai | Ultimate Autonomous Code Intelligence</title>
+    
+    <!-- Ultra Eye-Catching Modern Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- WebSocket Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
+    <!-- Spline 3D Viewer -->
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.0.94/build/spline-viewer.js"></script>
     <style>
         :root {
-            --bg-base: #0b0f19;
-            --card-bg: rgba(17, 24, 39, 0.9);
+            --bg-base: #000000;
+            --card-bg: rgba(10, 10, 10, 0.7);
             --accent-gold: #f59e0b;
             --accent-cyan: #06b6d4;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
+            --accent-neon: #0ea5e9;
+            --text-main: #ffffff;
+            --text-muted: #cbd5e1;
         }
 
         * { box-sizing: border-box; transition: all 0.3s ease; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: var(--bg-base);
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(-45deg, #000000, #0a0a0a, #141414, #000000);
+            background-size: 400% 400%;
+            animation: gradientMesh 15s ease infinite;
             color: var(--text-main);
             min-height: 100vh;
             margin: 0;
             padding: 40px 20px;
         }
 
-        .container { max-width: 950px; margin: auto; }
+        /* Hide Spline Logo */
+        spline-viewer::part(logo) { display: none !important; }
+
+        /* Spline Background Container */
+        .spline-container {
+            position: fixed;
+            left: -15vw;
+            top: 0;
+            width: 70vw;
+            height: 100vh;
+            overflow: hidden; /* physically hide the bottom watermark */
+            z-index: -1;
+            pointer-events: none;
+            display: none; /* Hidden on login page */
+        }
+
+        .spline-bg {
+            width: 100%;
+            height: calc(100vh + 90px); /* push the bottom part out of view */
+            opacity: 0.3; /* Adjust the transparency accordingly */
+        }
+
+        #dashboardView {
+            display: none;
+        }
+
+        .container { max-width: 950px; margin: 0 auto; position: relative; z-index: 10; }
 
         header { text-align: center; margin-bottom: 25px; }
 
         h1 {
-            font-size: 2.8rem;
-            background: linear-gradient(135deg, #f59e0b, #fbbf24, #d97706);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #06b6d4, #3b82f6, #a855f7);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin: 0 0 8px 0;
-            font-weight: 800;
+            margin: 0 0 10px 0;
+            font-weight: 700;
+            letter-spacing: -2px;
+            text-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
         }
 
-        p { color: var(--text-muted); font-size: 1.05rem; margin: 0; }
+        p { color: var(--text-muted); font-family: 'Inter', sans-serif; font-size: 1.15rem; margin: 0; line-height: 1.6; }
 
         /* Metrics Grid with Real-time Animation Glow */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 15px;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         @media(max-width: 768px) { .metrics-grid { grid-template-columns: repeat(2, 1fr); } }
 
         .metric-card {
-            background: rgba(17, 24, 39, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 15px;
-            border-radius: 12px;
+            background: rgba(15, 15, 15, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 18px;
+            border-radius: 16px;
             text-align: center;
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         .metric-card::after {
@@ -70,21 +114,42 @@
 
         @keyframes shimmer { 100% { left: 100%; } }
 
-        .metric-value { font-size: 1.4rem; font-weight: 800; color: var(--accent-gold); margin-top: 5px; }
-        .metric-value.grade { color: #10b981; }
+        .metric-value { 
+            font-family: 'Space Grotesk', sans-serif; 
+            font-size: 1.8rem; 
+            font-weight: 700; 
+            color: var(--accent-gold); 
+            margin-top: 8px; 
+            letter-spacing: -1px; 
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+        }
+        .metric-value.grade { color: #10b981; text-shadow: 0 0 20px rgba(16, 185, 129, 0.5); }
 
         .card {
             background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
         }
 
-        h3 { margin-top: 0; color: #fff; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
+        h3 { 
+            font-family: 'Space Grotesk', sans-serif; 
+            margin-top: 0; 
+            color: #38bdf8; 
+            margin-bottom: 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            letter-spacing: -1px; 
+            font-size: 1.4rem;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+        }
 
-        label { display: block; margin-bottom: 6px; font-weight: 600; color: #d1d5db; font-size: 0.85rem; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; color: #d1d5db; font-size: 0.85rem; text-align: left; }
 
         input, textarea, select {
             width: 100%;
@@ -98,6 +163,8 @@
             outline: none;
         }
 
+        input:focus { border-color: var(--accent-gold); }
+
         button.primary-btn {
             background: linear-gradient(135deg, #f59e0b, #d97706);
             color: #000;
@@ -110,38 +177,40 @@
             width: 100%;
         }
 
-        button.primary-btn:hover { background: linear-gradient(135deg, #fbbf24, #b45309); }
+        button.primary-btn:hover { background: linear-gradient(135deg, #fbbf24, #b45309); transform: translateY(-1px); }
 
         .scan-box { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         @media(max-width: 768px) { .scan-box { grid-template-columns: 1fr; } }
 
         .scan-panel {
-            background: rgba(3, 7, 18, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            padding: 18px;
-            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 22px;
+            border-radius: 16px;
         }
 
         /* IDE Terminal Simulator Box */
         .ide-terminal {
-            background: #020617;
-            border: 1px solid rgba(6, 182, 212, 0.3);
-            padding: 12px;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 0.8rem;
-            color: #38bdf8;
-            margin-top: 10px;
-            height: 90px;
+            background: #000;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            padding: 15px;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+            font-size: 0.85rem;
+            color: #06b6d4;
+            margin-top: 12px;
+            height: 100px;
             overflow-y: auto;
+            line-height: 1.5;
+            box-shadow: inset 0 0 15px rgba(6, 182, 212, 0.1);
         }
 
         .bug-item {
-            background: rgba(3, 7, 18, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 16px;
+            background: rgba(10, 10, 10, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 20px;
             border-left: 5px solid var(--accent-gold);
         }
 
@@ -185,13 +254,14 @@
         @media(max-width: 768px) { .diff-container { grid-template-columns: 1fr; } }
 
         .diff-box {
-            background: #020617;
-            padding: 10px;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 0.8rem;
+            background: #000;
+            padding: 15px;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+            font-size: 0.85rem;
             white-space: pre-wrap;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            line-height: 1.5;
         }
         .diff-box.removed { color: #f87171; border-color: rgba(248, 113, 113, 0.3); }
         .diff-box.added { color: #34d399; border-color: rgba(52, 211, 153, 0.3); }
@@ -220,69 +290,348 @@
             z-index: 1000;
         }
         .modal-content {
-            background: #111827;
-            padding: 30px;
-            border-radius: 16px;
+            background: #0a0a0a;
+            padding: 40px;
+            border-radius: 24px;
             max-width: 600px;
             width: 100%;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
         }
         .close-modal { background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 15px; width: 100%; }
+
+        /* --- BUG-ANIMATED LOGIN PAGE CSS --- */
+        #loginView {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.6); /* Transparent so matrix/cyberbugs can be behind it */
+            overflow: hidden;
+        }
+
+        /* Matrix / Cyber Code Background */
+        #bugContainer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2; pointer-events: none;
+            background: radial-gradient(circle at center, #020617 0%, #000000 100%);
+            overflow: hidden;
+        }
+
+        /* Floating Glowing Bugs */
+        .cyber-bug {
+            position: absolute;
+            width: 6px; height: 12px;
+            background: #34d399;
+            border-radius: 40%;
+            box-shadow: 0 0 15px 4px #34d399, 0 0 30px #10b981;
+            opacity: 0;
+            filter: blur(1px);
+        }
+
+        /* 21st.dev SPLIT SCREEN LOGIN RECREATION */
+        .login-split {
+            display: flex; width: 100%; height: 100vh; position: absolute; top: 0; left: 0; z-index: 10;
+        }
+        .login-left {
+            flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            position: relative; overflow: hidden;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .login-right {
+            flex: 1; display: flex; justify-content: center; align-items: center;
+        }
+        @media(max-width: 768px) { .login-left { display: none; } }
+
+        /* Ripple Effect */
+        .ripple-wrapper {
+            position: absolute; inset: 0; display: flex; justify-content: center; align-items: center;
+            mask-image: linear-gradient(to bottom, black, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, black, transparent);
+        }
+        .ripple-circle {
+            position: absolute; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15);
+            animation: ripple 4s linear infinite;
+        }
+        @keyframes ripple { 0% { transform: scale(0.8); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
+
+        /* Orbit Display */
+        .orbit-container {
+            position: relative; width: 400px; height: 400px;
+            display: flex; justify-content: center; align-items: center; z-index: 10;
+        }
+        .orbit-text {
+            font-family: 'Space Grotesk', sans-serif; font-size: 3.5rem; font-weight: 700;
+            background: linear-gradient(to bottom, #ffffff, rgba(255,255,255,0.3));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-align: center; line-height: 1; z-index: 20;
+        }
+        .orbit-ring {
+            position: absolute; border-radius: 50%; border: 1px solid rgba(255,255,255,0.05);
+            animation: spin 20s linear infinite; display: flex; justify-content: center; align-items: flex-start;
+        }
+        .orbit-ring.reverse { animation-direction: reverse; }
+        .orbit-icon {
+            width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+            display: flex; justify-content: center; align-items: center;
+            transform: translateY(-50%); animation: spin 20s linear infinite reverse; font-size: 1.5rem;
+        }
+        .orbit-ring.reverse .orbit-icon { animation-direction: normal; }
+
+        /* Form container */
+        .auth-form { width: 100%; max-width: 350px; }
+        
+        .box-reveal { position: relative; overflow: hidden; display: block; width: 100%; margin-bottom: 2px; }
+        .box-reveal-content { animation: revealFade 0.5s ease-in-out forwards 0.2s; opacity: 0; transform: translateY(20px); }
+        .box-reveal-overlay {
+            position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            background: #5046e6; border-radius: 4px; z-index: 20;
+            animation: revealSlide 0.5s ease-in-out forwards;
+        }
+        @keyframes revealFade { to { opacity: 1; transform: translateY(0); } }
+        @keyframes revealSlide { 0% { left: 0; right: 100%; } 50% { left: 0; right: 0; } 100% { left: 100%; right: 0; } }
+
+        .auth-form h2 { font-family: 'Space Grotesk', sans-serif; font-size: 2.2rem; margin: 0 0 5px 0; color: #fff; }
+        .auth-form p.sub { color: #a1a1aa; font-size: 0.95rem; margin: 0 0 25px 0; font-family: 'Inter', sans-serif; }
+
+        /* Input with mouse tracking glow */
+        .input-group { margin-bottom: 15px; position: relative; }
+        .input-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; font-weight: 500; color: #e2e8f0; font-family: 'Inter', sans-serif;}
+        
+        .input-wrapper {
+            position: relative; padding: 2px; border-radius: 10px; background: rgba(255,255,255,0.05); transition: background 0.3s;
+        }
+        .input-wrapper::before {
+            content: ""; position: absolute; inset: 0; border-radius: 10px;
+            background: radial-gradient(100px circle at var(--mouse-x, 0) var(--mouse-y, 0), #3b82f6, transparent 80%);
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .input-wrapper:hover::before { opacity: 1; }
+        
+        .input-wrapper input {
+            position: relative; z-index: 2; width: 100%; height: 44px;
+            background: #18181b; border: none; border-radius: 8px;
+            padding: 0 16px; color: #fff; font-family: 'Inter', sans-serif;
+            outline: none; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+        }
+        .input-wrapper input:focus { box-shadow: inset 0 0 0 2px #52525b; }
+
+        .submit-btn {
+            position: relative; width: 100%; height: 44px; margin-top: 10px;
+            background: #18181b; border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px; color: #fff; font-weight: 500; cursor: pointer;
+            overflow: hidden; display: flex; justify-content: center; align-items: center;
+        }
+        .submit-btn .bottom-glow {
+            position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, #06b6d4, transparent);
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .submit-btn:hover .bottom-glow { opacity: 1; }
+        .submit-btn:hover { background: #27272a; }
+
+        .divider {
+            display: flex; align-items: center; text-align: center; margin: 20px 0;
+            color: #64748b; font-size: 0.85rem; font-family: 'Inter', sans-serif;
+        }
+        .divider::before, .divider::after {
+            content: ''; flex: 1; border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .divider:not(:empty)::before { margin-right: .25em; }
+        .divider:not(:empty)::after { margin-left: .25em; }
+
+        .btn-google {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff; border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 20px; font-size: 1rem;
+            border-radius: 12px; cursor: pointer; font-weight: 600; width: 100%;
+            display: flex; justify-content: center; align-items: center; gap: 12px;
+            transition: all 0.3s ease; font-family: 'Inter', sans-serif;
+        }
+        .btn-google:hover { background: rgba(255, 255, 255, 0.1); }
+        .btn-google img { width: 22px; height: 22px; }
+
+        .spinner { display: none; width: 18px; height: 18px; border: 2px solid rgba(0,0,0,0.3); border-top: 2px solid #000; border-radius: 50%; animation: spin 1s linear infinite; }
+        
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Bug Lens-Ai</h1>
-            <p>Real-Time Autonomous Code Intelligence, IDE Plugin Simulation, & Automated Unit Tests</p>
-        </header>
+    
+    <!-- Background 3D Robot (Hidden on Login, Shown on Dashboard) -->
+    <div id="splineWrapper" class="spline-container">
+        <spline-viewer class="spline-bg" url="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"></spline-viewer>
+    </div>
 
-        <!-- Metrics Grid with Real-time Animation -->
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <div style="font-size:0.75rem; color:var(--text-muted);">HEALTH GRADE</div>
-                <div class="metric-value grade" id="healthGrade">A</div>
-            </div>
-            <div class="metric-card">
-                <div style="font-size:0.75rem; color:var(--text-muted);">TOTAL DEFECTS</div>
-                <div class="metric-value" id="totalBugs">0</div>
-            </div>
-            <div class="metric-card">
-                <div style="font-size:0.75rem; color:var(--text-muted);">TOKENS CONSUMED</div>
-                <div class="metric-value" id="tokenCount">0</div>
-            </div>
-            <div class="metric-card">
-                <div style="font-size:0.75rem; color:var(--text-muted);">HOURS SAVED</div>
-                <div class="metric-value" id="hoursSaved" style="color:#38bdf8;">0.0h</div>
-            </div>
-        </div>
-
-        <!-- Repository Scanner & IDE Live Simulator Card -->
-        <div class="card">
-            <h3>Autonomous Repository & VS Code IDE Plugin Simulator</h3>
-            <div class="scan-box">
-                <div class="scan-panel">
-                    <label>GitHub Repository URL</label>
-                    <input type="text" id="repoUrl" placeholder="https://github.com/user/project">
-                    <button class="primary-btn" onclick="scanRepo()">Scan Repository</button>
+    <!-- SECTION 1: ANIMATED LOGIN PAGE -->
+    <div id="loginView">
+        <div id="bugContainer"></div>
+        
+        <div class="login-split">
+            <!-- LEFT SIDE: Orbit & Ripple -->
+            <div class="login-left">
+                <div class="ripple-wrapper">
+                    <div class="ripple-circle" style="width: 210px; height: 210px; animation-delay: 0s; border-style: solid;"></div>
+                    <div class="ripple-circle" style="width: 280px; height: 280px; animation-delay: 0.1s; border-style: solid;"></div>
+                    <div class="ripple-circle" style="width: 350px; height: 350px; animation-delay: 0.2s; border-style: solid;"></div>
+                    <div class="ripple-circle" style="width: 420px; height: 420px; animation-delay: 0.3s; border-style: solid;"></div>
+                    <div class="ripple-circle" style="width: 490px; height: 490px; animation-delay: 0.4s; border-style: dashed;"></div>
                 </div>
-                <div class="scan-panel">
-                    <label>VS Code IDE Extension Live Stream</label>
-                    <div class="ide-terminal" id="ideTerminal">
-                        [IDE Plugin] Connected to Bug Lens-Ai daemon...<br>
-                        [Watcher] Monitoring active editor buffer for exceptions...
+                
+                <div class="orbit-container">
+                    <div class="orbit-text" style="font-size: 2.6rem;">Welcome to<br>Bug Lens-Ai</div>
+                    
+                    <!-- Bug Rings -->
+                    <div class="orbit-ring" style="width: 270px; height: 270px; animation-duration: 20s;">
+                        <div class="orbit-icon" style="animation-duration: 20s; font-size: 2.2rem; width: 65px; height: 65px;">🐞</div>
+                    </div>
+                    <div class="orbit-ring reverse" style="width: 150px; height: 150px; animation-duration: 15s;">
+                        <div class="orbit-icon" style="animation-duration: 15s; font-size: 2.2rem; width: 65px; height: 65px;">🐛</div>
+                    </div>
+                    <div class="orbit-ring" style="width: 330px; height: 330px; animation-duration: 25s; animation-delay: -5s;">
+                        <div class="orbit-icon" style="animation-duration: 25s; animation-delay: -5s; font-size: 2.2rem; width: 65px; height: 65px;">🕷️</div>
                     </div>
                 </div>
             </div>
-            <div style="margin-top: 15px; text-align: right;">
-                <button class="primary-btn" style="width: auto; background: linear-gradient(135deg, #06b6d4, #0284c7); color:#fff; padding: 8px 16px; font-size:0.85rem;" onclick="openAuditReport()">📊 View Full Execution Report</button>
+
+            <!-- RIGHT SIDE: Form -->
+            <div class="login-right">
+                <div class="auth-form">
+                    <div class="box-reveal">
+                        <div class="box-reveal-overlay"></div>
+                        <div class="box-reveal-content">
+                            <h2>Welcome back</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="box-reveal">
+                        <div class="box-reveal-overlay" style="animation-delay: 0.1s; background: var(--accent-cyan);"></div>
+                        <div class="box-reveal-content" style="animation-delay: 0.3s">
+                            <p class="sub">Sign in to your account</p>
+                        </div>
+                    </div>
+
+                    <div class="box-reveal" style="width: 100%;">
+                        <div class="box-reveal-overlay" style="animation-delay: 0.15s; background: #fff;"></div>
+                        <div class="box-reveal-content" style="animation-delay: 0.35s">
+                            <button class="btn-google" onclick="console.log('Google Auth triggered')">
+                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/google/google-original.svg" alt="Google">
+                                Sign in with Google
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="box-reveal" style="width: 100%;">
+                        <div class="box-reveal-overlay" style="animation-delay: 0.2s; background: #475569;"></div>
+                        <div class="box-reveal-content" style="animation-delay: 0.4s">
+                            <div class="divider">or</div>
+                        </div>
+                    </div>
+
+                    <div class="box-reveal">
+                        <div class="box-reveal-overlay" style="animation-delay: 0.25s; background: #3b82f6;"></div>
+                        <div class="box-reveal-content" style="animation-delay: 0.45s">
+                            <div class="input-group">
+                                <label>Email *</label>
+                                <div class="input-wrapper glow-effect">
+                                    <input type="email" id="email" placeholder="Enter your email address">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="box-reveal">
+                        <div class="box-reveal-overlay" style="animation-delay: 0.3s; background: var(--accent-gold);"></div>
+                        <div class="box-reveal-content" style="animation-delay: 0.5s">
+                            <div class="input-group">
+                                <label>Password *</label>
+                                <div class="input-wrapper glow-effect">
+                                    <input type="password" id="password" placeholder="Enter your password">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="box-reveal" style="width: 100%;">
+                        <div class="box-reveal-overlay" style="animation-delay: 0.4s; background: var(--accent-neon);"></div>
+                        <div class="box-reveal-content" style="animation-delay: 0.6s">
+                            <button class="submit-btn" id="loginBtn" onclick="triggerHandshake()">
+                                <span id="btnText">Sign in &rarr;</span>
+                                <span class="spinner" id="btnSpinner" style="display:none; margin-left:10px;"></span>
+                                <div class="bottom-glow"></div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+    </div>
 
-        <!-- Triage Stream -->
-        <div class="card">
-            <h3>⚡ Live Triage, Diff & Regression Test Stream</h3>
-            <div id="bugList">Querying AI code analysis endpoint...</div>
+    <!-- SECTION 2: WORKING SCREEN (DASHBOARD) -->
+    <div id="dashboardView">
+        <div class="container">
+            <header>
+                <h1>Bug Lens-Ai</h1>
+                <p>Real-Time Autonomous Code Intelligence, IDE Plugin Simulation, & Automated Unit Tests</p>
+            </header>
+
+            <!-- Metrics Grid with Real-time Animation -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div style="font-size:0.75rem; color:var(--text-muted);">HEALTH GRADE</div>
+                    <div class="metric-value grade" id="healthGrade">A</div>
+                </div>
+                <div class="metric-card">
+                    <div style="font-size:0.75rem; color:var(--text-muted);">TOTAL DEFECTS</div>
+                    <div class="metric-value" id="totalBugs">0</div>
+                </div>
+                <div class="metric-card">
+                    <div style="font-size:0.75rem; color:var(--text-muted);">TOKENS CONSUMED</div>
+                    <div class="metric-value" id="tokenCount">0</div>
+                </div>
+                <div class="metric-card">
+                    <div style="font-size:0.75rem; color:var(--text-muted);">HOURS SAVED</div>
+                    <div class="metric-value" id="hoursSaved" style="color:#38bdf8;">0.0h</div>
+                </div>
+            </div>
+
+            <!-- Repository Scanner & IDE Live Simulator Card -->
+            <div class="card">
+                <h3>Autonomous Repository & VS Code IDE Plugin Simulator</h3>
+                <div class="scan-box">
+                    <div class="scan-panel">
+                        <label>GitHub Repository URL</label>
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <input type="text" id="repoUrl" placeholder="https://github.com/user/project" style="margin-bottom: 0;">
+                            <button class="primary-btn" style="width: auto; white-space: nowrap;" onclick="scanRepo()">Scan</button>
+                        </div>
+                        
+                        <div class="divider">OR</div>
+                        
+                        <label>Upload Project (.zip)</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="file" id="zipFile" accept=".zip" style="margin-bottom: 0; padding: 9px;">
+                            <button class="primary-btn" style="width: auto; white-space: nowrap; background: linear-gradient(135deg, #10b981, #059669);" onclick="uploadZip()">Auto-Fix ZIP</button>
+                        </div>
+                    </div>
+                    <div class="scan-panel">
+                        <label>VS Code IDE Extension Live Stream</label>
+                        <div class="ide-terminal" id="ideTerminal">
+                            [IDE Plugin] Connected to Bug Lens-Ai daemon...<br>
+                            [Watcher] Monitoring active editor buffer for exceptions...
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; text-align: right;">
+                    <button class="primary-btn" style="width: auto; background: linear-gradient(135deg, #06b6d4, #0284c7); color:#fff; padding: 8px 16px; font-size:0.85rem;" onclick="openAuditReport()">📊 View Full Execution Report</button>
+                </div>
+            </div>
+
+            <!-- Triage Stream -->
+            <div class="card">
+                <h3>⚡ Live Triage, Diff & Regression Test Stream</h3>
+                <div id="bugList">Querying AI code analysis endpoint...</div>
+            </div>
         </div>
     </div>
 
@@ -290,7 +639,7 @@
     <div id="reportModal" class="modal-overlay">
         <div class="modal-content">
             <h3 style="color:#f59e0b; margin-top:0;">📊 Execution Audit Report</h3>
-            <div id="reportDetails" style="font-family: monospace; font-size: 0.9rem; color: #cbd5e1; line-height: 1.6;">
+            <div id="reportDetails" style="font-family: 'SFMono-Regular', Consolas, monospace; font-size: 0.9rem; color: #a1a1aa; line-height: 1.6;">
                 Loading report data...
             </div>
             <button class="close-modal" onclick="closeModal('reportModal')">Close Report</button>
@@ -301,7 +650,7 @@
     <div id="prModal" class="modal-overlay">
         <div class="modal-content">
             <h3 style="color:#10b981; margin-top:0;">🐙 GitHub Pull Request Created</h3>
-            <div id="prDetails" style="font-family: monospace; font-size: 0.9rem; color: #cbd5e1; line-height: 1.6;">
+            <div id="prDetails" style="font-family: 'SFMono-Regular', Consolas, monospace; font-size: 0.9rem; color: #a1a1aa; line-height: 1.6;">
                 Loading PR info...
             </div>
             <button class="close-modal" onclick="closeModal('prModal')">Close PR View</button>
@@ -310,6 +659,77 @@
 
     <script>
         let currentBugs = [];
+
+        // Navigate from Login to Dashboard using the Animated Handshake
+        function triggerHandshake() {
+            const btn = document.getElementById('loginBtn');
+            const text = document.getElementById('btnText');
+            const spinner = document.getElementById('btnSpinner');
+
+            // 1. Change button state to loading
+            text.innerText = "Authenticating Protocol...";
+            spinner.style.display = "block";
+            btn.style.pointerEvents = "none"; // Prevent double clicking
+
+            // 2. Simulate server handshake delay (2.5 seconds), then route to dashboard
+            setTimeout(() => {
+                text.innerText = "Access Granted. Routing...";
+                spinner.style.borderTopColor = "#fff";
+                
+                setTimeout(() => {
+                    // Hide login, show dashboard
+                    document.getElementById('loginView').style.display = 'none';
+                    document.getElementById('dashboardView').style.display = 'block';
+                    document.getElementById('splineWrapper').style.display = 'block';
+                    document.body.style.padding = '40px 20px'; // Restore padding for dashboard
+                    
+                    // Forcefully remove Spline Logo watermark from shadow DOM (backup)
+                    const hideSplineLogo = setInterval(() => {
+                        const viewer = document.querySelector('spline-viewer');
+                        if (viewer && viewer.shadowRoot) {
+                            const logo = viewer.shadowRoot.querySelector('#logo');
+                            if (logo) { logo.remove(); clearInterval(hideSplineLogo); }
+                        }
+                    }, 100);
+
+                    // Connect to WebSocket STOMP endpoint for real-time live terminal streaming
+                    connectWebSocket();
+
+                    // Fetch bugs when entering dashboard
+                    fetchBugs();
+                }, 800);
+
+            }, 2500);
+        }
+
+        let stompClient = null;
+
+        function connectWebSocket() {
+            const socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+            stompClient.debug = null; // Disable debug logging in console
+            
+            stompClient.connect({}, function (frame) {
+                console.log('Connected to Bug Lens-Ai WebSocket: ' + frame);
+                stompClient.subscribe('/topic/logs', function (message) {
+                    const terminal = document.getElementById('ideTerminal');
+                    // Check if it's an error message to color it red
+                    let color = "#06b6d4"; // Default cyan
+                    if (message.body.includes("[ERROR]") || message.body.includes("[Warning]")) {
+                        color = "#ef4444"; // Red
+                    } else if (message.body.includes("[Success]") || message.body.includes("100% Efficiency") || message.body.includes("Maintained")) {
+                        color = "#10b981"; // Green
+                    } else if (message.body.includes("Agent]")) {
+                        color = "#c084fc"; // Purple for AI
+                    }
+                    
+                    terminal.innerHTML += `<br><span style="color:${color};">${message.body}</span>`;
+                    terminal.scrollTop = terminal.scrollHeight;
+                });
+            }, function(error) {
+                console.error("STOMP Connection error: ", error);
+            });
+        }
 
         // Real-time counter animation function
         function animateValue(id, start, end, duration) {
@@ -391,26 +811,68 @@
             const url = document.getElementById('repoUrl').value;
             if (!url) { alert('Please enter a GitHub repository URL'); return; }
             
-            // Update IDE Terminal Simulator with realistic activity logs
             const terminal = document.getElementById('ideTerminal');
-            terminal.innerHTML += `<br>[VS Code] Cloning ${url.split('/').pop()} into sandbox...`;
-            terminal.innerHTML += `<br>[AST Analyzer] Parsing syntax tree & detecting code smells...`;
+            terminal.innerHTML += `<br><span style="color:#f59e0b;">[Scan Request] Initializing pipeline for ${url.split('/').pop()}...</span>`;
             terminal.scrollTop = terminal.scrollHeight;
 
-            await fetch('/api/bugs', {
+            await fetch('/api/repo/autofix', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    title: "Security Risk in " + url.split('/').pop(),
-                    description: "AI daemon scanned editor buffer and isolated an unhandled exception pointer leak.",
-                    severity: "HIGH"
+                    repoUrl: url
                 })
             });
 
-            terminal.innerHTML += `<br><span style="color:#34d399;">[Success] Vulnerability quarantined and sent to triage matrix.</span>`;
-            terminal.scrollTop = terminal.scrollHeight;
             document.getElementById('repoUrl').value = '';
             fetchBugs();
+        }
+
+        async function uploadZip() {
+            const fileInput = document.getElementById('zipFile');
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert('Please select a .zip file to upload');
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const terminal = document.getElementById('ideTerminal');
+            terminal.innerHTML += `<br><span style="color:#f59e0b;">[Scan Request] Uploading and extracting ${file.name}...</span>`;
+            terminal.scrollTop = terminal.scrollHeight;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/api/zip/autofix', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || "Failed to process zip");
+                }
+                
+                terminal.innerHTML += `<br><span style="color:#10b981;">[Success] Autonomous ZIP Pipeline completed. Downloading fixed project...</span>`;
+                terminal.scrollTop = terminal.scrollHeight;
+                
+                // Trigger download
+                const blob = await response.blob();
+                const downloadUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = `fixed_${file.name}`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(downloadUrl);
+                
+                fileInput.value = ''; // Reset input
+                fetchBugs(); // Refresh UI tokens and defects
+            } catch (err) {
+                terminal.innerHTML += `<br><span style="color:#ef4444;">[ERROR] ${err.message}</span>`;
+                terminal.scrollTop = terminal.scrollHeight;
+            }
         }
 
         async function triggerAutoFix(id, title) {
@@ -459,7 +921,55 @@
             document.getElementById(modalId).style.display = 'none';
         }
 
-        fetchBugs();
+        // Initialize Cyber Bugs on Login
+        function initCyberBugs() {
+            const container = document.getElementById('bugContainer');
+            if(!container) return;
+            for(let i=0; i<50; i++) {
+                let bug = document.createElement('div');
+                bug.className = 'cyber-bug';
+                bug.style.left = Math.random() * 100 + 'vw';
+                bug.style.top = Math.random() * 100 + 'vh';
+                
+                // Randomize colors: neon green, cyan, glowing gold
+                let rand = Math.random();
+                if(rand > 0.6) {
+                    bug.style.background = '#06b6d4'; // Cyan
+                    bug.style.boxShadow = '0 0 15px 4px #06b6d4, 0 0 30px #0284c7';
+                } else if (rand > 0.3) {
+                    bug.style.background = '#f59e0b'; // Gold
+                    bug.style.boxShadow = '0 0 15px 4px #f59e0b, 0 0 30px #d97706';
+                }
+
+                container.appendChild(bug);
+
+                // Complex organic movement mimicking crawling bugs
+                bug.animate([
+                    { transform: `translate(0px, 0px) rotate(${Math.random()*360}deg)`, opacity: 0 },
+                    { opacity: Math.random() * 0.7 + 0.3, offset: 0.1 },
+                    { transform: `translate(${(Math.random()-0.5)*400}px, ${(Math.random()-0.5)*400}px) rotate(${Math.random()*720}deg)`, offset: 0.5 },
+                    { opacity: Math.random() * 0.7 + 0.3, offset: 0.9 },
+                    { transform: `translate(${(Math.random()-0.5)*600}px, ${(Math.random()-0.5)*600}px) rotate(${Math.random()*1080}deg)`, opacity: 0 }
+                ], {
+                    duration: 6000 + Math.random() * 10000,
+                    iterations: Infinity,
+                    delay: Math.random() * 5000
+                });
+            }
+        }
+        initCyberBugs();
+
+        // Input Mouse Tracking Glow Effect for 21st.dev Component
+        document.querySelectorAll('.glow-effect').forEach(wrapper => {
+            wrapper.addEventListener('mousemove', e => {
+                const rect = wrapper.getBoundingClientRect();
+                wrapper.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+                wrapper.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+            });
+        });
+
+        // Reset body padding for login view initially
+        document.body.style.padding = '0';
     </script>
 </body>
 </html>

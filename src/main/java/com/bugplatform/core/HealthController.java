@@ -2,6 +2,10 @@ package com.bugplatform.core;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import java.util.*;
 
 @Controller
@@ -10,11 +14,13 @@ public class HealthController {
     private final BugRepository bugRepository;
     private final GitHubService gitHubService;
     private final OpenAIService openAIService;
+    private final GitAutomationService gitAutomationService;
 
-    public HealthController(BugRepository bugRepository, GitHubService gitHubService, OpenAIService openAIService) {
+    public HealthController(BugRepository bugRepository, GitHubService gitHubService, OpenAIService openAIService, GitAutomationService gitAutomationService) {
         this.bugRepository = bugRepository;
         this.gitHubService = gitHubService;
         this.openAIService = openAIService;
+        this.gitAutomationService = gitAutomationService;
     }
 
     @GetMapping("/")
@@ -51,6 +57,32 @@ public class HealthController {
         bug.setStatus("RESOLVED & PR MERGED");
         bug.setGithubPrLink(prDetails.get("pullRequestUrl"));
         return bugRepository.save(bug);
+    }
+
+    @ResponseBody
+    @PostMapping("/api/repo/autofix")
+    public Object triggerRepoAutofix(@RequestBody Map<String, String> payload) {
+        String repoUrl = payload.get("repoUrl");
+        if (repoUrl == null || !repoUrl.matches("^https://github\\.com/[\\w-]+/[\\w.-]+(?:\\.git)?$")) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid GitHub repository URL"));
+        }
+        return gitAutomationService.cloneAndFix(repoUrl).join();
+    }
+
+    @PostMapping("/api/zip/autofix")
+    public ResponseEntity<?> triggerZipAutofix(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty() || !Objects.requireNonNull(file.getOriginalFilename()).endsWith(".zip")) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Please upload a valid .zip file"));
+        }
+        try {
+            byte[] fixedZip = gitAutomationService.processAndFixZip(file);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"fixed_" + file.getOriginalFilename() + "\"")
+                    .contentType(MediaType.parseMediaType("application/zip"))
+                    .body(fixedZip);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
+        }
     }
 
     @ResponseBody
