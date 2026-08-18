@@ -399,159 +399,193 @@
         }
         .close-modal { background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 15px; width: 100%; }
 
-        /* --- BUG-ANIMATED LOGIN PAGE CSS --- */
+        /* --- DRIBBBLE LOGIN PAGE CSS --- */
         #loginView {
             position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
             display: flex; justify-content: center; align-items: center;
             z-index: 100;
-            background: rgba(0, 0, 0, 0.6); /* Transparent so matrix/cyberbugs can be behind it */
+            background: linear-gradient(135deg, #f6e6ec, #e7d8e2);
             overflow: hidden;
+            font-family: 'Inter', sans-serif;
         }
 
-        /* Matrix / Cyber Code Background */
-        #bugContainer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -2; pointer-events: none;
-            background: radial-gradient(circle at center, #020617 0%, #000000 100%);
+        .login-card {
+            display: flex;
+            width: 100%;
+            max-width: 950px;
+            height: 600px;
+            background: #1c1d21;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
             overflow: hidden;
+            position: relative;
+            z-index: 10;
         }
 
-        /* Floating Glowing Bugs */
-        .cyber-bug {
+        .member-signin {
             position: absolute;
-            width: 6px; height: 12px;
-            background: #34d399;
-            border-radius: 40%;
-            box-shadow: 0 0 15px 4px #34d399, 0 0 30px #10b981;
-            opacity: 0;
-            filter: blur(1px);
+            top: 40px; right: 50%;
+            transform: translateX(110%);
+            color: #8b8c91;
+            font-size: 0.85rem;
+            font-weight: 500;
+            z-index: 10;
+            width: 45%;
+            text-align: right;
+        }
+        .member-signin span { color: #fff; font-weight: 700; cursor: pointer; }
+        
+        .member-signin-mobile { display: none; }
+        @media(max-width: 768px) {
+            .member-signin { display: none; }
+            .member-signin-mobile { display: block; text-align: center; margin-top: 15px; color: #8b8c91; font-size: 0.85rem; }
+            .member-signin-mobile span { color: #fff; font-weight: 700; cursor: pointer; }
         }
 
-        /* 21st.dev SPLIT SCREEN LOGIN RECREATION */
-        .login-split {
-            display: flex; width: 100%; height: 100vh; position: absolute; top: 0; left: 0; z-index: 10;
-        }
         .login-left {
-            flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            position: relative; overflow: hidden;
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            flex: 1.1;
+            padding: 50px 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
         }
+
         .login-right {
-            flex: 1; display: flex; justify-content: center; align-items: center;
+            flex: 0.9;
+            background: #0f1013;
+            border-radius: 20px;
+            margin: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
         }
-        @media(max-width: 768px) { .login-left { display: none; } }
-
-        /* Ripple Effect */
-        .ripple-wrapper {
-            position: absolute; inset: 0; display: flex; justify-content: center; align-items: center;
-            mask-image: linear-gradient(to bottom, black, transparent);
-            -webkit-mask-image: linear-gradient(to bottom, black, transparent);
-        }
-        .ripple-circle {
-            position: absolute; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15);
-            animation: ripple 4s linear infinite;
-        }
-        @keyframes ripple { 0% { transform: scale(0.8); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
-
-        /* Orbit Display */
-        .orbit-container {
-            position: relative; width: 400px; height: 400px;
-            display: flex; justify-content: center; align-items: center; z-index: 10;
-        }
-        .orbit-text {
-            font-family: 'Space Grotesk', sans-serif; font-size: 3.5rem; font-weight: 700;
-            background: linear-gradient(to bottom, #ffffff, rgba(255,255,255,0.3));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-align: center; line-height: 1; z-index: 20;
-        }
-        .orbit-ring {
-            position: absolute; border-radius: 50%; border: 1px solid rgba(255,255,255,0.05);
-            animation: spin 20s linear infinite; display: flex; justify-content: center; align-items: flex-start;
-        }
-        .orbit-ring.reverse { animation-direction: reverse; }
-        .orbit-icon {
-            width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
-            display: flex; justify-content: center; align-items: center;
-            transform: translateY(-50%); animation: spin 20s linear infinite reverse; font-size: 1.5rem;
-        }
-        .orbit-ring.reverse .orbit-icon { animation-direction: normal; }
-
-        /* Form container */
-        .auth-form { width: 100%; max-width: 350px; }
         
-        .box-reveal { position: relative; overflow: hidden; display: block; width: 100%; margin-bottom: 2px; }
-        .box-reveal-content { animation: revealFade 0.5s ease-in-out forwards 0.2s; opacity: 0; transform: translateY(20px); }
-        .box-reveal-overlay {
-            position: absolute; top: 0; bottom: 0; left: 0; right: 0;
-            background: #5046e6; border-radius: 4px; z-index: 20;
-            animation: revealSlide 0.5s ease-in-out forwards;
+        @media(max-width: 768px) {
+            .login-card { flex-direction: column; height: auto; max-width: 450px; margin: 20px; }
+            .login-left { padding: 40px 30px; }
+            .login-right { display: none; }
         }
-        @keyframes revealFade { to { opacity: 1; transform: translateY(0); } }
-        @keyframes revealSlide { 0% { left: 0; right: 100%; } 50% { left: 0; right: 0; } 100% { left: 100%; right: 0; } }
 
-        .auth-form h2 { font-family: 'Space Grotesk', sans-serif; font-size: 2.2rem; margin: 0 0 5px 0; color: #fff; }
-        .auth-form p.sub { color: #a1a1aa; font-size: 0.95rem; margin: 0 0 25px 0; font-family: 'Inter', sans-serif; }
+        .auth-logo {
+            position: absolute;
+            top: 40px; left: 60px;
+            color: #fff;
+            font-weight: 800;
+            font-size: 1.5rem;
+            display: flex; align-items: center; gap: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            z-index: 10;
+        }
+        @media(max-width: 768px) { .auth-logo { position: relative; top: 0; left: 0; margin-bottom: 20px; } }
 
-        /* Input with mouse tracking glow */
-        .input-group { margin-bottom: 15px; position: relative; }
-        .input-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; font-weight: 500; color: #e2e8f0; font-family: 'Inter', sans-serif;}
+        .login-left h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            color: #ffffff;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            font-weight: 700;
+            margin-top: 40px;
+        }
+
+        .auth-label {
+            color: #8b8c91;
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .social-btns {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .social-btn {
+            flex: 1;
+            background: #141518;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: #fff;
+            padding: 12px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        .social-btn:hover { background: #2a2b30; }
+
+        .divider-line {
+            width: 100%;
+            height: 1px;
+            background: rgba(255,255,255,0.05);
+            margin: 25px 0;
+        }
+
+        .email-input-wrapper {
+            position: relative;
+            margin-bottom: 15px;
+        }
         
-        .input-wrapper {
-            position: relative; padding: 2px; border-radius: 10px; background: rgba(255,255,255,0.05); transition: background 0.3s;
+        .email-input-wrapper svg {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8b8c91;
+            width: 18px; height: 18px;
         }
-        .input-wrapper::before {
-            content: ""; position: absolute; inset: 0; border-radius: 10px;
-            background: radial-gradient(100px circle at var(--mouse-x, 0) var(--mouse-y, 0), #3b82f6, transparent 80%);
-            opacity: 0; transition: opacity 0.3s;
+
+        .email-input {
+            width: 100%;
+            background: #141518;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: #fff;
+            padding: 14px 14px 14px 44px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            box-shadow: none;
         }
-        .input-wrapper:hover::before { opacity: 1; }
+        .email-input:focus { border-color: #fdbf4a; }
+
+        .continue-btn {
+            width: 100%;
+            background: #fdbf4a;
+            color: #000;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(253, 191, 74, 0.3);
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+            transition: all 0.3s ease;
+        }
+        .continue-btn:hover { background: #eab308; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(253, 191, 74, 0.4); }
+
+        .auth-footer {
+            color: #6b6c71;
+            font-size: 0.75rem;
+            line-height: 1.5;
+        }
+
+        .spline-login-bg {
+            width: 130%;
+            height: 130%;
+            transform: scale(1.1);
+        }
         
-        .input-wrapper input {
-            position: relative; z-index: 2; width: 100%; height: 44px;
-            background: #18181b; border: none; border-radius: 8px;
-            padding: 0 16px; color: #fff; font-family: 'Inter', sans-serif;
-            outline: none; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
-        }
-        .input-wrapper input:focus { box-shadow: inset 0 0 0 2px #52525b; }
-
-        .submit-btn {
-            position: relative; width: 100%; height: 44px; margin-top: 10px;
-            background: #18181b; border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px; color: #fff; font-weight: 500; cursor: pointer;
-            overflow: hidden; display: flex; justify-content: center; align-items: center;
-        }
-        .submit-btn .bottom-glow {
-            position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
-            background: linear-gradient(90deg, transparent, #06b6d4, transparent);
-            opacity: 0; transition: opacity 0.3s;
-        }
-        .submit-btn:hover .bottom-glow { opacity: 1; }
-        .submit-btn:hover { background: #27272a; }
-
-        .divider {
-            display: flex; align-items: center; text-align: center; margin: 20px 0;
-            color: #64748b; font-size: 0.85rem; font-family: 'Inter', sans-serif;
-        }
-        .divider::before, .divider::after {
-            content: ''; flex: 1; border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        .divider:not(:empty)::before { margin-right: .25em; }
-        .divider:not(:empty)::after { margin-left: .25em; }
-
-        .btn-google {
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff; border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 12px 20px; font-size: 1rem;
-            border-radius: 12px; cursor: pointer; font-weight: 600; width: 100%;
-            display: flex; justify-content: center; align-items: center; gap: 12px;
-            transition: all 0.3s ease; font-family: 'Inter', sans-serif;
-        }
-        .btn-google:hover { background: rgba(255, 255, 255, 0.1); }
-        .btn-google img { width: 22px; height: 22px; }
-
         .spinner { display: none; width: 18px; height: 18px; border: 2px solid rgba(0,0,0,0.3); border-top: 2px solid #000; border-radius: 50%; animation: spin 1s linear infinite; }
-        
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
@@ -562,106 +596,63 @@
         <spline-viewer class="spline-bg" url="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"></spline-viewer>
     </div>
 
-    <!-- SECTION 1: ANIMATED LOGIN PAGE -->
+    <!-- SECTION 1: DRIBBBLE LOGIN PAGE -->
     <div id="loginView">
-        <div id="bugContainer"></div>
-        
-        <div class="login-split">
-            <!-- LEFT SIDE: Orbit & Ripple -->
+        <div class="login-card">
+            <div class="auth-logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="24" height="24" rx="6" fill="#fdbf4a"/>
+                    <path d="M7 16V8h10v8" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                AI
+            </div>
+            
+            <div class="member-signin">
+                Already a member? <span>Sign in</span>
+            </div>
+
+            <!-- LEFT SIDE: Form -->
             <div class="login-left">
-                <div class="ripple-wrapper">
-                    <div class="ripple-circle" style="width: 210px; height: 210px; animation-delay: 0s; border-style: solid;"></div>
-                    <div class="ripple-circle" style="width: 280px; height: 280px; animation-delay: 0.1s; border-style: solid;"></div>
-                    <div class="ripple-circle" style="width: 350px; height: 350px; animation-delay: 0.2s; border-style: solid;"></div>
-                    <div class="ripple-circle" style="width: 420px; height: 420px; animation-delay: 0.3s; border-style: solid;"></div>
-                    <div class="ripple-circle" style="width: 490px; height: 490px; animation-delay: 0.4s; border-style: dashed;"></div>
+                <h2>Sign up</h2>
+                
+                <div class="auth-label">Sign up with Open account</div>
+                <div class="social-btns">
+                    <button class="social-btn" onclick="console.log('Google Auth triggered')">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/google/google-original.svg" alt="Google" width="18">
+                        Google
+                    </button>
+                    <button class="social-btn" onclick="console.log('Apple Auth triggered')">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12.8724 1.70114C12.8724 1.70114 12.3907 1.59978 11.9796 2.06201C11.6033 2.48512 11.3739 3.09062 11.3739 3.73836C11.3739 4.79522 12.3164 5.37894 12.3164 5.37894C12.3164 5.37894 12.8055 5.51868 13.2505 5.07471C13.6599 4.66606 13.916 4.04169 13.916 3.39174C13.916 2.30232 12.8724 1.70114 12.8724 1.70114ZM16.2737 9.80053C15.2289 9.80053 14.2882 10.5181 13.6841 10.5181C13.0766 10.5181 12.1867 9.87895 11.3413 9.87895C9.64166 9.87895 8.16911 11.082 7.30396 12.5933C5.55622 15.6429 6.84074 20.1581 8.56209 22.656C9.40051 23.8744 10.4357 25.2636 11.7516 25.2636C12.9806 25.2636 13.4353 24.5029 14.8687 24.5029C16.3022 24.5029 16.7118 25.2636 18.0055 25.2636C19.3453 25.2636 20.2524 24.0152 21.0506 22.8465C22.0461 21.3776 22.4578 19.9577 22.4578 19.9577C22.4578 19.9577 19.6455 18.887 19.6455 15.6586C19.6455 12.8251 21.9688 11.6023 21.9688 11.6023C20.6558 9.68424 18.5282 9.80053 18.5282 9.80053C17.7699 9.80053 17.0673 9.80053 16.2737 9.80053Z"/>
+                        </svg>
+                        Apple ID
+                    </button>
                 </div>
                 
-                <div class="orbit-container">
-                    <div class="orbit-text" style="font-size: 2.6rem;">Welcome to<br>Bug Lens-Ai</div>
-                    
-                    <!-- Bug Rings -->
-                    <div class="orbit-ring" style="width: 270px; height: 270px; animation-duration: 20s;">
-                        <div class="orbit-icon" style="animation-duration: 20s; font-size: 2.2rem; width: 65px; height: 65px;">🐞</div>
-                    </div>
-                    <div class="orbit-ring reverse" style="width: 150px; height: 150px; animation-duration: 15s;">
-                        <div class="orbit-icon" style="animation-duration: 15s; font-size: 2.2rem; width: 65px; height: 65px;">🐛</div>
-                    </div>
-                    <div class="orbit-ring" style="width: 330px; height: 330px; animation-duration: 25s; animation-delay: -5s;">
-                        <div class="orbit-icon" style="animation-duration: 25s; animation-delay: -5s; font-size: 2.2rem; width: 65px; height: 65px;">🕷️</div>
-                    </div>
+                <div class="divider-line"></div>
+
+                <div class="auth-label">Or continue with email address</div>
+                <div class="email-input-wrapper">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    <input type="email" id="email" class="email-input" placeholder="Your email">
+                </div>
+                
+                <button class="continue-btn" id="loginBtn" onclick="triggerHandshake()">
+                    <span id="btnText">Continue</span>
+                    <span class="spinner" id="btnSpinner"></span>
+                </button>
+
+                <div class="auth-footer">
+                    This site is protected by reCAPTCHA and the<br>Google Privacy Policy.
+                </div>
+                <div class="member-signin-mobile">
+                    Already a member? <span>Sign in</span>
                 </div>
             </div>
 
-            <!-- RIGHT SIDE: Form -->
+            <!-- RIGHT SIDE: Robot Image (Spline) -->
             <div class="login-right">
-                <div class="auth-form">
-                    <div class="box-reveal">
-                        <div class="box-reveal-overlay"></div>
-                        <div class="box-reveal-content">
-                            <h2>Welcome back</h2>
-                        </div>
-                    </div>
-                    
-                    <div class="box-reveal">
-                        <div class="box-reveal-overlay" style="animation-delay: 0.1s; background: var(--accent-cyan);"></div>
-                        <div class="box-reveal-content" style="animation-delay: 0.3s">
-                            <p class="sub">Sign in to your account</p>
-                        </div>
-                    </div>
-
-                    <div class="box-reveal" style="width: 100%;">
-                        <div class="box-reveal-overlay" style="animation-delay: 0.15s; background: #fff;"></div>
-                        <div class="box-reveal-content" style="animation-delay: 0.35s">
-                            <button class="btn-google" onclick="console.log('Google Auth triggered')">
-                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/google/google-original.svg" alt="Google">
-                                Sign in with Google
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="box-reveal" style="width: 100%;">
-                        <div class="box-reveal-overlay" style="animation-delay: 0.2s; background: #475569;"></div>
-                        <div class="box-reveal-content" style="animation-delay: 0.4s">
-                            <div class="divider">or</div>
-                        </div>
-                    </div>
-
-                    <div class="box-reveal">
-                        <div class="box-reveal-overlay" style="animation-delay: 0.25s; background: #3b82f6;"></div>
-                        <div class="box-reveal-content" style="animation-delay: 0.45s">
-                            <div class="input-group">
-                                <label>Email *</label>
-                                <div class="input-wrapper glow-effect">
-                                    <input type="email" id="email" placeholder="Enter your email address">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="box-reveal">
-                        <div class="box-reveal-overlay" style="animation-delay: 0.3s; background: var(--accent-gold);"></div>
-                        <div class="box-reveal-content" style="animation-delay: 0.5s">
-                            <div class="input-group">
-                                <label>Password *</label>
-                                <div class="input-wrapper glow-effect">
-                                    <input type="password" id="password" placeholder="Enter your password">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="box-reveal" style="width: 100%;">
-                        <div class="box-reveal-overlay" style="animation-delay: 0.4s; background: var(--accent-neon);"></div>
-                        <div class="box-reveal-content" style="animation-delay: 0.6s">
-                            <button class="submit-btn" id="loginBtn" onclick="triggerHandshake()">
-                                <span id="btnText">Sign in &rarr;</span>
-                                <span class="spinner" id="btnSpinner" style="display:none; margin-left:10px;"></span>
-                                <div class="bottom-glow"></div>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <spline-viewer class="spline-login-bg" url="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"></spline-viewer>
             </div>
         </div>
     </div>
@@ -670,8 +661,8 @@
     <div id="dashboardView">
         <div class="container">
             <header>
-                <h1>Bug Lens-Ai</h1>
-                <p>Real-Time Autonomous Code Intelligence, IDE Plugin Simulation, & Automated Unit Tests</p>
+                <h1>Bug Lens-Ai <span style="font-size: 0.5em; vertical-align: super; color: #0ea5e9;">Cyberpunk Edition</span></h1>
+                <p>Ultimate Autonomous Code Intelligence & Security Triage</p>
             </header>
 
             <!-- Metrics Grid with Real-time Animation -->
