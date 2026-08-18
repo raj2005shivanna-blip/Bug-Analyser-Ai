@@ -585,6 +585,54 @@
             transform: scale(1.1);
         }
         
+        @keyframes floatRobot {
+            0% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-15px) scale(1.03); }
+            100% { transform: translateY(0px) scale(1); }
+        }
+        .robot-wrapper {
+            width: 100%; height: 100%; position: relative;
+            animation: floatRobot 4s ease-in-out infinite;
+        }
+        .speech-bubble {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #111;
+            padding: 15px 25px;
+            border-radius: 20px 20px 0 20px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            opacity: 0;
+            transform: translateY(20px) scale(0.9);
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards 0.5s;
+            z-index: 20;
+        }
+        @keyframes popIn {
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        .animated-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.8rem !important;
+            margin-bottom: 25px !important;
+            font-weight: 800;
+            margin-top: 20px !important;
+            background: linear-gradient(270deg, #fdbf4a, #f72585, #4361ee, #fdbf4a);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 6s ease infinite;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
         .spinner { display: none; width: 18px; height: 18px; border: 2px solid rgba(0,0,0,0.3); border-top: 2px solid #000; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -599,29 +647,23 @@
     <!-- SECTION 1: DRIBBBLE LOGIN PAGE -->
     <div id="loginView">
         <div class="login-card">
-            <div class="auth-logo">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="24" height="24" rx="6" fill="#fdbf4a"/>
-                    <path d="M7 16V8h10v8" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                AI
-            </div>
+            <div class="auth-logo" style="display: none;"></div>
             
             <div class="member-signin">
-                Already a member? <span>Sign in</span>
+                Already a member? <span style="cursor: pointer;" onclick="triggerHandshake(event, true)">Sign in</span>
             </div>
 
             <!-- LEFT SIDE: Form -->
             <div class="login-left">
-                <h2>Sign up</h2>
+                <h2 class="animated-title">Bug Lens-Ai</h2>
                 
                 <div class="auth-label">Sign up with Open account</div>
                 <div class="social-btns">
-                    <button class="social-btn" onclick="console.log('Google Auth triggered')">
+                    <button class="social-btn" onclick="triggerHandshake(event, true)">
                         <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/google/google-original.svg" alt="Google" width="18">
                         Google
                     </button>
-                    <button class="social-btn" onclick="console.log('Apple Auth triggered')">
+                    <button class="social-btn" onclick="triggerHandshake(event, true)">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12.8724 1.70114C12.8724 1.70114 12.3907 1.59978 11.9796 2.06201C11.6033 2.48512 11.3739 3.09062 11.3739 3.73836C11.3739 4.79522 12.3164 5.37894 12.3164 5.37894C12.3164 5.37894 12.8055 5.51868 13.2505 5.07471C13.6599 4.66606 13.916 4.04169 13.916 3.39174C13.916 2.30232 12.8724 1.70114 12.8724 1.70114ZM16.2737 9.80053C15.2289 9.80053 14.2882 10.5181 13.6841 10.5181C13.0766 10.5181 12.1867 9.87895 11.3413 9.87895C9.64166 9.87895 8.16911 11.082 7.30396 12.5933C5.55622 15.6429 6.84074 20.1581 8.56209 22.656C9.40051 23.8744 10.4357 25.2636 11.7516 25.2636C12.9806 25.2636 13.4353 24.5029 14.8687 24.5029C16.3022 24.5029 16.7118 25.2636 18.0055 25.2636C19.3453 25.2636 20.2524 24.0152 21.0506 22.8465C22.0461 21.3776 22.4578 19.9577 22.4578 19.9577C22.4578 19.9577 19.6455 18.887 19.6455 15.6586C19.6455 12.8251 21.9688 11.6023 21.9688 11.6023C20.6558 9.68424 18.5282 9.80053 18.5282 9.80053C17.7699 9.80053 17.0673 9.80053 16.2737 9.80053Z"/>
                         </svg>
@@ -637,7 +679,12 @@
                     <input type="email" id="email" class="email-input" placeholder="Your email">
                 </div>
                 
-                <button class="continue-btn" id="loginBtn" onclick="triggerHandshake()">
+                <div class="email-input-wrapper">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <input type="password" id="password" class="email-input" placeholder="Your password">
+                </div>
+                
+                <button class="continue-btn" id="loginBtn" onclick="triggerHandshake(event, false)">
                     <span id="btnText">Continue</span>
                     <span class="spinner" id="btnSpinner"></span>
                 </button>
@@ -646,13 +693,17 @@
                     This site is protected by reCAPTCHA and the<br>Google Privacy Policy.
                 </div>
                 <div class="member-signin-mobile">
-                    Already a member? <span>Sign in</span>
+                    Already a member? <span style="cursor: pointer;" onclick="triggerHandshake(event, true)">Sign in</span>
                 </div>
             </div>
 
-            <!-- RIGHT SIDE: Robot Image (Spline) -->
+            <!-- RIGHT SIDE: Robot Image / Video -->
             <div class="login-right">
-                <spline-viewer class="spline-login-bg" url="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"></spline-viewer>
+                <div class="robot-wrapper" style="overflow: hidden; border-radius: 20px;">
+                    <video autoplay loop muted playsinline style="position: absolute; height: 125%; width: auto; max-width: none; top: 50%; right: -20%; transform: translateY(-50%); outline: none; border: none; pointer-events: none;">
+                        <source src="https://cdn.dribbble.com/userupload/17486162/file/large-c2c3fe6d9522d72c991fde7b196d2905.mp4" type="video/mp4">
+                    </video>
+                </div>
             </div>
         </div>
     </div>
@@ -888,7 +939,18 @@
         let currentBugs = [];
 
         // Navigate from Login to Dashboard using the Animated Handshake
-        function triggerHandshake() {
+        function triggerHandshake(event, isSocial = false) {
+            if (event) event.preventDefault();
+
+            if (!isSocial) {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                if (!email || !password) {
+                    alert("Please enter both email and password to continue.");
+                    return;
+                }
+            }
+
             const btn = document.getElementById('loginBtn');
             const text = document.getElementById('btnText');
             const spinner = document.getElementById('btnSpinner');
@@ -907,7 +969,10 @@
                     // Hide login, show dashboard
                     document.getElementById('loginView').style.display = 'none';
                     document.getElementById('dashboardView').style.display = 'block';
-                    document.getElementById('splineWrapper').style.display = 'block';
+                    
+                    const splineWrapper = document.getElementById('splineWrapper');
+                    if (splineWrapper) splineWrapper.style.display = 'block';
+                    
                     document.body.style.padding = '40px 20px'; // Restore padding for dashboard
                     
                     // Forcefully remove Spline Logo watermark from shadow DOM (backup)
