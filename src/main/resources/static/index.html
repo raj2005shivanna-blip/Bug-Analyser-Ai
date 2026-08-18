@@ -1442,6 +1442,7 @@
                     await fetch('/api/bugs/clear', { method: 'POST' });
                     const term = document.getElementById('ideTerminal');
                     if(term) term.innerHTML = "[IDE Plugin] Execution cache cleared. Ready for new workspace...<br>";
+                    clearDashboardUI();
                     fetchBugs(); // Refreshes and clears the UI
                 } catch (e) {
                     console.error("Error clearing cache", e);
