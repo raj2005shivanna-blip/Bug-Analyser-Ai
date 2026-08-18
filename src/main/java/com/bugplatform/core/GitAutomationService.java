@@ -43,11 +43,13 @@ public class GitAutomationService {
     private final BugRepository bugRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final OpenAIService openAIService;
+    private final NLPCompressionService nlpCompressionService;
 
-    public GitAutomationService(BugRepository bugRepository, SimpMessagingTemplate messagingTemplate, OpenAIService openAIService) {
+    public GitAutomationService(BugRepository bugRepository, SimpMessagingTemplate messagingTemplate, OpenAIService openAIService, NLPCompressionService nlpCompressionService) {
         this.bugRepository = bugRepository;
         this.messagingTemplate = messagingTemplate;
         this.openAIService = openAIService;
+        this.nlpCompressionService = nlpCompressionService;
     }
 
     private void logToClient(String message) {
@@ -185,7 +187,9 @@ public class GitAutomationService {
                 logToClient("[Crypto] Hash Generated: " + hexString.substring(0, 16) + "...");
 
                 // 6. OpenAI Analysis
-                Map<String, Object> aiMetrics = openAIService.analyzeCodeWithRealAI(fileContent);
+                logToClient("[NLP Engine] Compressing payload via Tokenization & Lemmatization...");
+                String compressedContent = nlpCompressionService.compressText(fileContent);
+                Map<String, Object> aiMetrics = openAIService.analyzeCodeWithRealAI(compressedContent);
 
                 // 7. Save to Database
                 BugReport report = new BugReport(
@@ -206,7 +210,7 @@ public class GitAutomationService {
                 report.setStatus("RESOLVED");
                 report.setComplexityScore((Integer) aiMetrics.get("cyclomaticComplexity"));
                 report.setMaintainability((String) aiMetrics.get("maintainabilityIndex"));
-                report.setTokensUsed(850);
+                report.setTokensUsed(Math.max(120, compressedContent.length() / 4));
                 report.setFileLocation(fileName);
                 report.setResolvedAt(java.time.LocalDateTime.now().toString());
                 report.setLineNumber(extractedLine);
@@ -375,7 +379,9 @@ public class GitAutomationService {
             Files.writeString(targetFile.toPath(), patchedContent);
 
             // AI Metrics & DB Storage (for Token Tracking)
-            Map<String, Object> aiMetrics = openAIService.analyzeCodeWithRealAI(fileContent);
+            logToClient("[NLP Engine] Compressing payload via Tokenization & Lemmatization...");
+            String compressedContent = nlpCompressionService.compressText(fileContent);
+            Map<String, Object> aiMetrics = openAIService.analyzeCodeWithRealAI(compressedContent);
             BugReport report = new BugReport(
                 "Security Risk in uploaded ZIP: " + targetFile.getName(),
                 "Detected NullLiteral vulnerability in uploaded zip file. Injected invariant block comments via AST.",
@@ -400,7 +406,7 @@ public class GitAutomationService {
             report.setStatus("RESOLVED");
             report.setComplexityScore((Integer) aiMetrics.get("cyclomaticComplexity"));
             report.setMaintainability((String) aiMetrics.get("maintainabilityIndex"));
-            report.setTokensUsed(1250);
+            report.setTokensUsed(Math.max(120, compressedContent.length() / 4));
             report.setFileLocation(fileName);
             report.setResolvedAt(java.time.LocalDateTime.now().toString());
             report.setLineNumber(extractedLine);
