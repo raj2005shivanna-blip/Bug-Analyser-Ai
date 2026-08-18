@@ -75,6 +75,7 @@ public class HealthController {
         if (repoUrl == null || !repoUrl.matches("^https://github\\.com/[\\w-]+/[\\w.-]+(?:\\.git)?$")) {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid GitHub repository URL"));
         }
+        bugRepository.deleteAll(); // Clear old executions
         return gitAutomationService.cloneAndFix(repoUrl).join();
     }
 
@@ -84,6 +85,7 @@ public class HealthController {
             return ResponseEntity.badRequest().body(Map.of("error", "Please upload a valid .zip file"));
         }
         try {
+            bugRepository.deleteAll(); // Clear old executions
             byte[] fixedZip = gitAutomationService.processAndFixZip(file);
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"fixed_" + file.getOriginalFilename() + "\"")
@@ -110,5 +112,12 @@ public class HealthController {
         report.put("auditTimestamp", new Date().toString());
         report.put("fixedDefectsList", allBugs.stream().filter(b -> b.getStatus().contains("RESOLVED")).map(BugReport::getTitle).toList());
         return report;
+    }
+
+    @ResponseBody
+    @PostMapping("/api/bugs/clear")
+    public Map<String, String> clearBugs() {
+        bugRepository.deleteAll();
+        return Map.of("status", "cleared");
     }
 }

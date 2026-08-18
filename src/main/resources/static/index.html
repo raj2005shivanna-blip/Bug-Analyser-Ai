@@ -764,6 +764,7 @@
                     </div>
                 </div>
                 <div style="margin-top: 15px; text-align: right;">
+                    <button class="primary-btn" style="width: auto; background: linear-gradient(135deg, #ef4444, #b91c1c); color:#fff; padding: 8px 16px; font-size:0.85rem; margin-right: 10px;" onclick="clearCache()">🗑️ Clear Cache & History</button>
                     <button class="primary-btn" style="width: auto; background: linear-gradient(135deg, #06b6d4, #0284c7); color:#fff; padding: 8px 16px; font-size:0.85rem;" onclick="openAuditReport()">📊 View Full Execution Report</button>
                 </div>
             </div>
@@ -1060,12 +1061,10 @@
                 document.getElementById('healthGrade').innerText = grade;
 
                 if (currentBugs.length === 0) {
-                    bugList.innerHTML = '<p style="color: #4b5563; text-align: center; padding: 20px; font-family: monospace;">[SYSTEM] Clean state. Paste a GitHub repository URL above to initiate autonomous AI analysis.</p>';
-                    return;
-                }
-
-                bugList.innerHTML = currentBugs.map(bug => `
-                    <div class="bug-item ${bug.status.includes('RESOLVED') ? 'RESOLVED' : ''}">
+                    bugList.innerHTML = '<p style="color: #4b5563; text-align: center; padding: 20px; font-family: monospace;">[SYSTEM] Clean state. Paste a GitHub repository URL or upload a ZIP above to initiate autonomous AI analysis.</p>';
+                } else {
+                    bugList.innerHTML = currentBugs.map(bug => `
+                        <div class="bug-item ${bug.status.includes('RESOLVED') ? 'RESOLVED' : ''}">
                         <div class="bug-header">
                             <span>${bug.title}</span>
                             <span class="badge ${bug.status.includes('RESOLVED') ? 'RESOLVED' : ''}">${bug.status}</span>
@@ -1139,10 +1138,13 @@
                         </div>
                     </div>
                 `).reverse().join('');
+                }
                 
                 if (currentBugs.length > 0) {
                     fetchGlobalAnalytics();
                     initOrUpdateDashboard();
+                } else {
+                    clearDashboardUI();
                 }
             } catch (err) {
                 console.error('Error fetching bugs:', err);
@@ -1153,8 +1155,14 @@
             const url = document.getElementById('repoUrl').value;
             if (!url) { alert('Please enter a GitHub repository URL'); return; }
             
+            currentBugs = [];
+            const bugList = document.getElementById('bugList');
+            if (bugList) bugList.innerHTML = '<p style="color: #4b5563; text-align: center; padding: 20px; font-family: monospace;">[SYSTEM] Execution started. Live stream in progress...</p>';
+            
+            clearDashboardUI();
+
             const terminal = document.getElementById('ideTerminal');
-            terminal.innerHTML += `<br><span style="color:#f59e0b;">[Scan Request] Initializing pipeline for ${url.split('/').pop()}...</span>`;
+            terminal.innerHTML = `<span style="color:#f59e0b;">[Scan Request] Initializing pipeline for ${url.split('/').pop()}...</span><br>`;
             terminal.scrollTop = terminal.scrollHeight;
 
             await fetch('/api/repo/autofix', {
@@ -1177,8 +1185,15 @@
             }
             
             const file = fileInput.files[0];
+            
+            currentBugs = [];
+            const bugList = document.getElementById('bugList');
+            if (bugList) bugList.innerHTML = '<p style="color: #4b5563; text-align: center; padding: 20px; font-family: monospace;">[SYSTEM] Uploading and extracting ZIP file. Live stream in progress...</p>';
+            
+            clearDashboardUI();
+
             const terminal = document.getElementById('ideTerminal');
-            terminal.innerHTML += `<br><span style="color:#f59e0b;">[Scan Request] Uploading and extracting ${file.name}...</span>`;
+            terminal.innerHTML = `<span style="color:#f59e0b;">[Scan Request] Uploading and extracting ${file.name}...</span><br>`;
             terminal.scrollTop = terminal.scrollHeight;
 
             const formData = new FormData();
@@ -1398,6 +1413,42 @@
         let trendChartInstance = null;
         let locationChartInstance = null;
 
+        function clearDashboardUI() {
+            const dashboard = document.getElementById('analyticsDashboardCard');
+            if (dashboard) dashboard.style.display = 'none';
+            
+            const globalContent = document.getElementById('globalAnalyticsContent');
+            if (globalContent) globalContent.innerHTML = '<p style="color: #4b5563; font-family: monospace; text-align: center; padding: 20px;">[SYSTEM] Awaiting execution to perform global AI analysis...</p>';
+            
+            const evalResults = document.getElementById('evalResults');
+            if (evalResults) evalResults.style.display = 'none';
+            
+            const evalLoading = document.getElementById('evalLoading');
+            if (evalLoading) evalLoading.style.display = 'none';
+            
+            const totalBugs = document.getElementById('totalBugs');
+            if (totalBugs) totalBugs.innerText = '0';
+            const tokenCount = document.getElementById('tokenCount');
+            if (tokenCount) tokenCount.innerText = '0';
+            const hoursSaved = document.getElementById('hoursSaved');
+            if (hoursSaved) hoursSaved.innerText = '0.0h';
+            const healthGrade = document.getElementById('healthGrade');
+            if (healthGrade) healthGrade.innerText = '-';
+        }
+
+        async function clearCache() {
+            if (confirm("Are you sure you want to clear all execution history? This will reset the dashboard for a new execution.")) {
+                try {
+                    await fetch('/api/bugs/clear', { method: 'POST' });
+                    const term = document.getElementById('ideTerminal');
+                    if(term) term.innerHTML = "[IDE Plugin] Execution cache cleared. Ready for new workspace...<br>";
+                    fetchBugs(); // Refreshes and clears the UI
+                } catch (e) {
+                    console.error("Error clearing cache", e);
+                }
+            }
+        }
+
         function initOrUpdateDashboard() {
             document.getElementById('analyticsDashboardCard').style.display = 'block';
             updateDashboardCharts();
@@ -1584,7 +1635,8 @@
             document.getElementById('evalResults').style.display = 'none';
             
             try {
-                const response = await fetch('/api/evaluate?version=v2.1.0-beta');
+                // Add cache-busting timestamp to prevent aggressive browser caching
+                const response = await fetch('/api/evaluate?version=v2.1.0-beta&t=' + new Date().getTime());
                 const metrics = await response.json();
                 
                 document.getElementById('evalLoading').style.display = 'none';
