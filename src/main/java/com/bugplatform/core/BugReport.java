@@ -64,6 +64,14 @@ public class BugReport {
     private String projectBackendStack;
     private String projectAlgorithms;
 
+    // --- Industry-Grade Differentiator fields ---
+    private Double sbflOchiaiScore;
+    private Integer blastRadiusScore;
+    private String shieldStatus;
+    @Column(columnDefinition = "TEXT")
+    private String reproducerTest;
+    private String taintPathSummary;
+
     public BugReport() {}
 
     public BugReport(String title, String description, String severity) {
@@ -192,4 +200,19 @@ public class BugReport {
     public void setProjectBackendStack(String projectBackendStack) { this.projectBackendStack = projectBackendStack; }
     public String getProjectAlgorithms() { return projectAlgorithms; }
     public void setProjectAlgorithms(String projectAlgorithms) { this.projectAlgorithms = projectAlgorithms; }
+
+    public Double getSbflOchiaiScore() { return sbflOchiaiScore; }
+    public void setSbflOchiaiScore(Double sbflOchiaiScore) { this.sbflOchiaiScore = sbflOchiaiScore; }
+
+    public Integer getBlastRadiusScore() { return blastRadiusScore; }
+    public void setBlastRadiusScore(Integer blastRadiusScore) { this.blastRadiusScore = blastRadiusScore; }
+
+    public String getShieldStatus() { return shieldStatus; }
+    public void setShieldStatus(String shieldStatus) { this.shieldStatus = shieldStatus; }
+
+    public String getReproducerTest() { return reproducerTest; }
+    public void setReproducerTest(String reproducerTest) { this.reproducerTest = reproducerTest; }
+
+    public String getTaintPathSummary() { return taintPathSummary; }
+    public void setTaintPathSummary(String taintPathSummary) { this.taintPathSummary = taintPathSummary; }
 }

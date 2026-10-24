@@ -120,4 +120,77 @@ public class AdvancedAnalyticsController {
         BugFeedback saved = feedbackRepository.save(feedback);
         return ResponseEntity.ok(saved);
     }
+
+    // 16. Spectrum-Based Fault Localization (Ochiai & Tarantula)
+    @GetMapping("/sbfl/{id}")
+    public ResponseEntity<SpectrumFaultLocalizationService.SBFLReport> getSbfl(@PathVariable String id) {
+        return ResponseEntity.ok(analyticsService.getSbflReport(id));
+    }
+
+    @PostMapping("/sbfl")
+    public ResponseEntity<SpectrumFaultLocalizationService.SBFLReport> analyzeSbflCustom(@RequestBody Map<String, String> payload) {
+        String code = payload.getOrDefault("code", "");
+        String fileName = payload.getOrDefault("fileName", "TargetSource.java");
+        return ResponseEntity.ok(analyticsService.analyzeSbfl(code, fileName));
+    }
+
+    // 17. Inter-Procedural Call Graph & Taint Tracking
+    @GetMapping("/taint-analysis")
+    public ResponseEntity<TaintAndCallGraphService.TaintAnalysisResult> getTaintAnalysisDefault() {
+        return ResponseEntity.ok(analyticsService.getTaintAnalysis(""));
+    }
+
+    @GetMapping("/taint-analysis/{id}")
+    public ResponseEntity<TaintAndCallGraphService.TaintAnalysisResult> getTaintAnalysisForBug(@PathVariable String id) {
+        return ResponseEntity.ok(analyticsService.getTaintAnalysis(id));
+    }
+
+    @PostMapping("/taint-analysis")
+    public ResponseEntity<TaintAndCallGraphService.TaintAnalysisResult> analyzeTaintCustom(@RequestBody Map<String, String> payload) {
+        String code = payload.getOrDefault("code", "");
+        String fileName = payload.getOrDefault("fileName", "SecurityController.java");
+        return ResponseEntity.ok(analyticsService.analyzeTaint(code, fileName));
+    }
+
+    // 18. AI Hallucination & Patch Anti-Pattern Shield
+    @PostMapping("/anti-pattern-shield")
+    public ResponseEntity<PatchQualityAndAntiPatternService.ShieldAuditReport> auditAntiPatternShield(@RequestBody Map<String, String> payload) {
+        String orig = payload.getOrDefault("originalCode", "");
+        String patch = payload.getOrDefault("patchedCode", "");
+        return ResponseEntity.ok(analyticsService.auditPatchWithShield(orig, patch));
+    }
+
+    // 19. Blast Radius & Downstream Dependency Impact
+    @GetMapping("/blast-radius/{id}")
+    public ResponseEntity<BlastRadiusService.BlastRadiusReport> getBlastRadiusForBug(@PathVariable String id) {
+        return ResponseEntity.ok(analyticsService.getBlastRadius(id));
+    }
+
+    @PostMapping("/blast-radius")
+    public ResponseEntity<BlastRadiusService.BlastRadiusReport> analyzeBlastRadiusCustom(@RequestBody Map<String, String> payload) {
+        String file = payload.getOrDefault("fileName", "CoreEngine.java");
+        String orig = payload.getOrDefault("originalCode", "");
+        String patch = payload.getOrDefault("patchedCode", "");
+        return ResponseEntity.ok(analyticsService.analyzeBlastRadius(file, orig, patch));
+    }
+
+    // 20. In-Memory Sandbox Compile & Iterative Self-Correction Loop
+    @PostMapping("/compile-verify")
+    public ResponseEntity<Map<String, Object>> runSandboxCompile(@RequestBody Map<String, Object> payload) {
+        String code = String.valueOf(payload.getOrDefault("code", ""));
+        int iterations = 3;
+        if (payload.containsKey("maxIterations")) {
+            try {
+                iterations = Integer.parseInt(payload.get("maxIterations").toString());
+            } catch (Exception ignored) {}
+        }
+        return ResponseEntity.ok(analyticsService.runCompileSandbox(code, iterations));
+    }
+
+    // 21. Concurrency Race Condition Analyzer
+    @PostMapping("/concurrency-check")
+    public ResponseEntity<Map<String, Object>> checkConcurrency(@RequestBody Map<String, String> payload) {
+        String code = payload.getOrDefault("code", "");
+        return ResponseEntity.ok(analyticsService.analyzeConcurrency(code));
+    }
 }

@@ -10,9 +10,25 @@ import java.util.stream.Collectors;
 public class AdvancedAnalyticsService {
 
     private final BugRepository bugRepository;
+    private final CompilerSandboxService compilerSandboxService;
+    private final SpectrumFaultLocalizationService sbflService;
+    private final TaintAndCallGraphService taintService;
+    private final PatchQualityAndAntiPatternService shieldService;
+    private final BlastRadiusService blastRadiusService;
 
-    public AdvancedAnalyticsService(BugRepository bugRepository) {
+    public AdvancedAnalyticsService(
+            BugRepository bugRepository,
+            CompilerSandboxService compilerSandboxService,
+            SpectrumFaultLocalizationService sbflService,
+            TaintAndCallGraphService taintService,
+            PatchQualityAndAntiPatternService shieldService,
+            BlastRadiusService blastRadiusService) {
         this.bugRepository = bugRepository;
+        this.compilerSandboxService = compilerSandboxService;
+        this.sbflService = sbflService;
+        this.taintService = taintService;
+        this.shieldService = shieldService;
+        this.blastRadiusService = blastRadiusService;
     }
 
     // AST Parser helper
@@ -309,5 +325,82 @@ public class AdvancedAnalyticsService {
             "appliedPatterns", List.of("AST Structural Anti-Pattern", "Null Safety Guard Missing"),
             "dataIsolationStatus", "Verified. Syntax Trees isolated safely."
         );
+    }
+
+    // 14. Spectrum-Based Fault Localization (Ochiai & Tarantula)
+    public SpectrumFaultLocalizationService.SBFLReport getSbflReport(String bugId) {
+        Optional<BugReport> b = bugRepository.findById(bugId);
+        String code = b.map(BugReport::getOriginalCode).orElse("public void test() { Object x = null; x.toString(); }");
+        String file = b.map(BugReport::getFileLocation).orElse("Unknown.java");
+        return sbflService.analyzeFaultSpectrum(code, file);
+    }
+
+    public SpectrumFaultLocalizationService.SBFLReport analyzeSbfl(String code, String fileName) {
+        return sbflService.analyzeFaultSpectrum(code, fileName);
+    }
+
+    // 15. Call Graph & Taint Tracking
+    public TaintAndCallGraphService.TaintAnalysisResult getTaintAnalysis(String bugId) {
+        Optional<BugReport> b = bugRepository.findById(bugId);
+        String code = b.map(BugReport::getOriginalCode).orElse("");
+        String file = b.map(BugReport::getFileLocation).orElse("AppController.java");
+        return taintService.analyzeCodebaseTaint(code, file);
+    }
+
+    public TaintAndCallGraphService.TaintAnalysisResult analyzeTaint(String code, String fileName) {
+        return taintService.analyzeCodebaseTaint(code, fileName);
+    }
+
+    // 16. AI Hallucination & Anti-Pattern Shield
+    public PatchQualityAndAntiPatternService.ShieldAuditReport auditPatchWithShield(String origCode, String patchCode) {
+        return shieldService.auditPatchQuality(origCode, patchCode);
+    }
+
+    // 17. Blast Radius & Dependency Ripple Analysis
+    public BlastRadiusService.BlastRadiusReport getBlastRadius(String bugId) {
+        Optional<BugReport> b = bugRepository.findById(bugId);
+        String orig = b.map(BugReport::getOriginalCode).orElse("");
+        String patch = b.map(BugReport::getPatchedCode).orElse("");
+        String file = b.map(BugReport::getFileLocation).orElse("CoreEngine.java");
+        return blastRadiusService.calculateBlastRadius(file, orig, patch);
+    }
+
+    public BlastRadiusService.BlastRadiusReport analyzeBlastRadius(String file, String orig, String patch) {
+        return blastRadiusService.calculateBlastRadius(file, orig, patch);
+    }
+
+    // 18. Sandbox Compilation & Iterative Self-Correction
+    public Map<String, Object> runCompileSandbox(String code, int iterations) {
+        return compilerSandboxService.compileAndAutoCorrect(code, iterations);
+    }
+
+    // 19. Concurrency & Race Condition Analyzer
+    public Map<String, Object> analyzeConcurrency(String code) {
+        boolean hasThreading = code != null && (code.contains("Thread") || code.contains("Runnable") || code.contains("synchronized") || code.contains("volatile") || code.contains("Atomic") || code.contains("Lock"));
+        boolean hasUnsafeMap = code != null && (code.contains("HashMap") && !code.contains("ConcurrentHashMap"));
+        
+        List<Map<String, String>> warnings = new ArrayList<>();
+        if (hasUnsafeMap) {
+            warnings.add(Map.of(
+                "severity", "HIGH",
+                "hazard", "Non-thread-safe HashMap accessed in potentially concurrent execution context",
+                "recommendation", "Replace with ConcurrentHashMap or wrap with Collections.synchronizedMap()"
+            ));
+        }
+        if (code != null && code.contains("static ") && !code.contains("final ") && !code.contains("synchronized")) {
+            warnings.add(Map.of(
+                "severity", "CRITICAL",
+                "hazard", "Mutable static state accessed without memory barrier / synchronized block",
+                "recommendation", "Encapsulate static field in AtomicReference or provide atomic mutate methods"
+            ));
+        }
+
+        Map<String, Object> res = new HashMap<>();
+        res.put("isThreadSafe", warnings.isEmpty());
+        res.put("concurrencyPrimitivesDetected", hasThreading);
+        res.put("hazardsCount", warnings.size());
+        res.put("hazards", warnings);
+        res.put("verdict", warnings.isEmpty() ? "Thread Safety Audit Passed" : "Concurrency Race Hazard Detected");
+        return res;
     }
 }
