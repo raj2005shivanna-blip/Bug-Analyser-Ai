@@ -39,6 +39,18 @@ public class DifferentiatorServicesTest {
     @Autowired
     private CodeChurnHotspotService churnHotspotService;
 
+    @Autowired
+    private SymbolicExecutionService symbolicExecutionService;
+
+    @Autowired
+    private MemoryLeakDetectionService memoryLeakDetectionService;
+
+    @Autowired
+    private ContractInvariantService contractInvariantService;
+
+    @Autowired
+    private ChaosResilienceService chaosResilienceService;
+
     @Test
     @DisplayName("Test 1: In-Memory Compiler Sandbox & Diagnostics")
     public void testCompilerSandbox() {
@@ -179,5 +191,47 @@ public class DifferentiatorServicesTest {
         assertNotNull(report);
         assertTrue(report.getTotalModulesAnalyzed() > 0);
         assertTrue(report.getRepositoryAverageComplexity() > 1.0);
+    }
+
+    @Test
+    @DisplayName("Test 10: Symbolic Path Condition & Boundary Crash Synthesizer (0% AI)")
+    public void testSymbolicExecution() {
+        String code = "public class BoundsTarget { public int divide(int a, int b) { if (b == 0) return 0; return a / b; } }";
+        SymbolicExecutionService.SymbolicReport report = symbolicExecutionService.analyzeAndSynthesizeCrashTests(code, "BoundsTarget.java");
+        assertNotNull(report);
+        assertTrue(report.getBoundaryVectorsSynthesized() > 0);
+        assertNotNull(report.getSynthesizedJUnitTestSuite());
+    }
+
+    @Test
+    @DisplayName("Test 11: JVM Escape Analysis & Memory Leak Profiler (0% AI)")
+    public void testMemoryLeakDetection() {
+        String leakyCode = "public class CacheTarget { private static java.util.List<Object> items = new java.util.ArrayList<>(); public void add(Object o) { items.add(o); } }";
+        MemoryLeakDetectionService.MemoryAuditReport report = memoryLeakDetectionService.analyzeMemorySafety(leakyCode, "CacheTarget.java");
+        assertNotNull(report);
+        assertTrue(report.getTotalHazardsIdentified() > 0);
+        assertTrue(report.getHeapRetentionHazardScore() > 0.0);
+    }
+
+    @Test
+    @DisplayName("Test 12: Semantic Contract & Daikon Invariant Regression Guard (0% AI)")
+    public void testContractInvariantRegressionGuard() {
+        String orig = "public class GuardTarget { public String get() { return \"safe\"; } }";
+        String broken = "public class GuardTarget { public String get() { return null; } }";
+        ContractInvariantService.ContractAuditReport report = contractInvariantService.verifyContractPreservation(orig, broken);
+        assertNotNull(report);
+        assertTrue(report.getViolationsDetected() > 0);
+        assertEquals("REGRESSION_RISK", report.getContractVerdict());
+    }
+
+    @Test
+    @DisplayName("Test 13: Automated Chaos Engineering & Resilience Profiler (0% AI)")
+    public void testChaosResilienceProfiler() {
+        String remoteCode = "public class OrderService { public String call() { return restTemplate.getForObject(\"http://ext/api\", String.class); } }";
+        ChaosResilienceService.ChaosResilienceReport report = chaosResilienceService.auditResilience(remoteCode, "OrderService.java");
+        assertNotNull(report);
+        assertTrue(report.getTotalRemoteInvocations() > 0);
+        assertNotNull(report.getResilienceGrade());
+        assertFalse(report.getChaosSimulations().isEmpty());
     }
 }

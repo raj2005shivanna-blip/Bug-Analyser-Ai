@@ -19,6 +19,10 @@ public class AdvancedAnalyticsService {
     private final ConcurrencyDeadlockService concurrencyDeadlockService;
     private final BinaryCompatibilityService binaryCompatibilityService;
     private final CodeChurnHotspotService churnHotspotService;
+    private final SymbolicExecutionService symbolicService;
+    private final MemoryLeakDetectionService memoryLeakService;
+    private final ContractInvariantService contractInvariantService;
+    private final ChaosResilienceService chaosResilienceService;
 
     public AdvancedAnalyticsService(
             BugRepository bugRepository,
@@ -30,7 +34,11 @@ public class AdvancedAnalyticsService {
             MutationTestingService mutationService,
             ConcurrencyDeadlockService concurrencyDeadlockService,
             BinaryCompatibilityService binaryCompatibilityService,
-            CodeChurnHotspotService churnHotspotService) {
+            CodeChurnHotspotService churnHotspotService,
+            SymbolicExecutionService symbolicService,
+            MemoryLeakDetectionService memoryLeakService,
+            ContractInvariantService contractInvariantService,
+            ChaosResilienceService chaosResilienceService) {
         this.bugRepository = bugRepository;
         this.compilerSandboxService = compilerSandboxService;
         this.sbflService = sbflService;
@@ -41,6 +49,10 @@ public class AdvancedAnalyticsService {
         this.concurrencyDeadlockService = concurrencyDeadlockService;
         this.binaryCompatibilityService = binaryCompatibilityService;
         this.churnHotspotService = churnHotspotService;
+        this.symbolicService = symbolicService;
+        this.memoryLeakService = memoryLeakService;
+        this.contractInvariantService = contractInvariantService;
+        this.chaosResilienceService = chaosResilienceService;
     }
 
     // AST Parser helper
@@ -434,5 +446,25 @@ public class AdvancedAnalyticsService {
     // 23. McCabe Cyclomatic Complexity & Commit Churn Hotspot Prediction
     public CodeChurnHotspotService.HotspotReport analyzeRepositoryHotspots(String code, String file) {
         return churnHotspotService.analyzeRepositoryHotspots(code, file);
+    }
+
+    // 24. Symbolic Path Condition & Automated Boundary Crash Synthesizer
+    public SymbolicExecutionService.SymbolicReport runSymbolicAnalysis(String code, String file) {
+        return symbolicService.analyzeAndSynthesizeCrashTests(code, file);
+    }
+
+    // 25. JVM Escape Analysis & Heap Retention Hazard Profiler
+    public MemoryLeakDetectionService.MemoryAuditReport auditMemorySafety(String code, String file) {
+        return memoryLeakService.analyzeMemorySafety(code, file);
+    }
+
+    // 26. Semantic Contract & Daikon Invariant Regression Guard
+    public ContractInvariantService.ContractAuditReport verifyContractPreservation(String orig, String patch) {
+        return contractInvariantService.verifyContractPreservation(orig, patch);
+    }
+
+    // 27. Automated Chaos Engineering & Microservice Resilience Profiler
+    public ChaosResilienceService.ChaosResilienceReport auditChaosResilience(String code, String file) {
+        return chaosResilienceService.auditResilience(code, file);
     }
 }

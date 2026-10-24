@@ -225,4 +225,37 @@ public class AdvancedAnalyticsController {
         String file = payload.getOrDefault("fileName", "CoreEngineService.java");
         return ResponseEntity.ok(analyticsService.analyzeRepositoryHotspots(code, file));
     }
+
+    // 26. Symbolic Path Condition & Automated Boundary Crash Synthesizer
+    @PostMapping("/symbolic-execution")
+    public ResponseEntity<SymbolicExecutionService.SymbolicReport> runSymbolicExecution(@RequestBody Map<String, String> payload) {
+        String code = payload.getOrDefault("code", "public void process(int x, String s) { if (x > 100) { s.length(); } }");
+        String file = payload.getOrDefault("fileName", "SymbolicTarget.java");
+        return ResponseEntity.ok(analyticsService.runSymbolicAnalysis(code, file));
+    }
+
+    // 27. JVM Escape Analysis & Heap Retention Hazard Profiler
+    @PostMapping("/memory-leak")
+    public ResponseEntity<MemoryLeakDetectionService.MemoryAuditReport> auditMemoryLeak(@RequestBody Map<String, String> payload) {
+        String code = payload.getOrDefault("code", "");
+        String file = payload.getOrDefault("fileName", "SessionManager.java");
+        return ResponseEntity.ok(analyticsService.auditMemorySafety(code, file));
+    }
+
+    // 28. Semantic Contract & Daikon Invariant Regression Guard
+    @PostMapping("/contract-invariants")
+    public ResponseEntity<ContractInvariantService.ContractAuditReport> auditContractInvariants(@RequestBody Map<String, String> payload) {
+        String orig = payload.getOrDefault("originalCode", "");
+        String patch = payload.getOrDefault("patchedCode", "");
+        return ResponseEntity.ok(analyticsService.verifyContractPreservation(orig, patch));
+    }
+
+    // 29. Automated Chaos Engineering & Microservice Resilience Profiler
+    @PostMapping("/chaos-resilience")
+    public ResponseEntity<ChaosResilienceService.ChaosResilienceReport> auditChaosResilience(@RequestBody Map<String, String> payload) {
+        String code = payload.getOrDefault("code", "");
+        String file = payload.getOrDefault("fileName", "PaymentGatewayClient.java");
+        return ResponseEntity.ok(analyticsService.auditChaosResilience(code, file));
+    }
 }
+
