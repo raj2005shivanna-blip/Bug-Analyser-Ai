@@ -193,4 +193,36 @@ public class AdvancedAnalyticsController {
         String code = payload.getOrDefault("code", "");
         return ResponseEntity.ok(analyticsService.analyzeConcurrency(code));
     }
+
+    // 22. Deterministic AST Mutation Testing (PIT-Style Mutation Score)
+    @PostMapping("/mutation-testing")
+    public ResponseEntity<MutationTestingService.MutationReport> runMutationTesting(@RequestBody Map<String, String> payload) {
+        String code = payload.getOrDefault("code", "public void test(int x) { if (x > 0) process(x + 1); }");
+        String file = payload.getOrDefault("fileName", "MutationTarget.java");
+        return ResponseEntity.ok(analyticsService.runMutationAnalysis(code, file));
+    }
+
+    // 23. Concurrency Deadlock & Lock Acquisition Wait-For Graph
+    @PostMapping("/concurrency-deadlock")
+    public ResponseEntity<ConcurrencyDeadlockService.ConcurrencyReport> runDeadlockAnalysis(@RequestBody Map<String, String> payload) {
+        String code = payload.getOrDefault("code", "");
+        String file = payload.getOrDefault("fileName", "ThreadCoordinator.java");
+        return ResponseEntity.ok(analyticsService.runConcurrencySafety(code, file));
+    }
+
+    // 24. JLS Binary & Source Backwards Compatibility
+    @PostMapping("/binary-compatibility")
+    public ResponseEntity<BinaryCompatibilityService.CompatibilityReport> auditBinaryCompatibility(@RequestBody Map<String, String> payload) {
+        String orig = payload.getOrDefault("originalCode", "");
+        String patch = payload.getOrDefault("patchedCode", "");
+        return ResponseEntity.ok(analyticsService.auditBinaryCompatibility(orig, patch));
+    }
+
+    // 25. McCabe Cyclomatic Complexity & Commit Churn Hotspot Prediction
+    @PostMapping("/churn-hotspots")
+    public ResponseEntity<CodeChurnHotspotService.HotspotReport> analyzeChurnHotspots(@RequestBody Map<String, String> payload) {
+        String code = payload.getOrDefault("code", "");
+        String file = payload.getOrDefault("fileName", "CoreEngineService.java");
+        return ResponseEntity.ok(analyticsService.analyzeRepositoryHotspots(code, file));
+    }
 }

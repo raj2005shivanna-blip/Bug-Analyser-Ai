@@ -27,6 +27,18 @@ public class DifferentiatorServicesTest {
     @Autowired
     private BlastRadiusService blastRadiusService;
 
+    @Autowired
+    private MutationTestingService mutationService;
+
+    @Autowired
+    private ConcurrencyDeadlockService concurrencyDeadlockService;
+
+    @Autowired
+    private BinaryCompatibilityService binaryCompatibilityService;
+
+    @Autowired
+    private CodeChurnHotspotService churnHotspotService;
+
     @Test
     @DisplayName("Test 1: In-Memory Compiler Sandbox & Diagnostics")
     public void testCompilerSandbox() {
@@ -105,5 +117,67 @@ public class DifferentiatorServicesTest {
         assertTrue(report.getBlastRadiusScore() > 0);
         assertFalse(report.getImpactedComponents().isEmpty());
         assertFalse(report.getImpactedEndpoints().isEmpty());
+    }
+
+    @Test
+    @DisplayName("Test 6: AST Mutation Testing (PIT-Style Mutation Score - 0% AI)")
+    public void testMutationTesting() {
+        String code = "public class Calc {\n" +
+                      "    public int calculate(int a, int b) {\n" +
+                      "        if (a > 10) return a + b;\n" +
+                      "        return 0;\n" +
+                      "    }\n" +
+                      "}\n";
+        MutationTestingService.MutationReport report = mutationService.runMutationAnalysis(code, "Calc.java");
+        assertNotNull(report);
+        assertTrue(report.getTotalMutantsGenerated() > 0);
+        assertTrue(report.getMutationScorePercentage() > 0.0);
+        assertNotNull(report.getTestRobustnessVerdict());
+    }
+
+    @Test
+    @DisplayName("Test 7: Concurrency Deadlock & Lock Acquisition Graph (0% AI)")
+    public void testDeadlockDetection() {
+        String concurrentCode = "public class SynchDemo {\n" +
+                                "    private final Object lockA = new Object();\n" +
+                                "    private final Object lockB = new Object();\n" +
+                                "    public void task() {\n" +
+                                "        synchronized(lockA) {\n" +
+                                "            synchronized(lockB) { doWork(); }\n" +
+                                "        }\n" +
+                                "    }\n" +
+                                "}\n";
+        ConcurrencyDeadlockService.ConcurrencyReport report = concurrencyDeadlockService.analyzeConcurrencySafety(concurrentCode, "SynchDemo.java");
+        assertNotNull(report);
+        assertFalse(report.getLockAcquisitionGraph().isEmpty());
+        assertNotNull(report.getOverallVerdict());
+    }
+
+    @Test
+    @DisplayName("Test 8: JLS Binary & Source Backwards Compatibility (0% AI)")
+    public void testBinaryCompatibility() {
+        String orig = "public class ApiContract { public String fetchUser(int id) { return \"user\"; } }";
+        // Method deleted = binary break:
+        String brokenPatch = "public class ApiContract { private String fetchUser(int id) { return \"user\"; } }";
+        BinaryCompatibilityService.CompatibilityReport report = binaryCompatibilityService.auditBinaryCompatibility(orig, brokenPatch);
+        assertNotNull(report);
+        assertFalse(report.isBinaryCompatible(), "Changing public method to private must trigger JLS binary break");
+        assertTrue(report.getRecommendedSemVerBump().contains("MAJOR"));
+    }
+
+    @Test
+    @DisplayName("Test 9: McCabe Cyclomatic Complexity & Commit Churn Hotspots (0% AI)")
+    public void testChurnHotspots() {
+        String complexCode = "public class Flow {\n" +
+                             "    public void run(int x) {\n" +
+                             "        if (x > 0) {\n" +
+                             "            for (int i=0; i<x; i++) { if (i % 2 == 0) log(); }\n" +
+                             "        }\n" +
+                             "    }\n" +
+                             "}\n";
+        CodeChurnHotspotService.HotspotReport report = churnHotspotService.analyzeRepositoryHotspots(complexCode, "Flow.java");
+        assertNotNull(report);
+        assertTrue(report.getTotalModulesAnalyzed() > 0);
+        assertTrue(report.getRepositoryAverageComplexity() > 1.0);
     }
 }

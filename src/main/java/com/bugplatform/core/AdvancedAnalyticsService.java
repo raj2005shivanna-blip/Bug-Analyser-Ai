@@ -15,6 +15,10 @@ public class AdvancedAnalyticsService {
     private final TaintAndCallGraphService taintService;
     private final PatchQualityAndAntiPatternService shieldService;
     private final BlastRadiusService blastRadiusService;
+    private final MutationTestingService mutationService;
+    private final ConcurrencyDeadlockService concurrencyDeadlockService;
+    private final BinaryCompatibilityService binaryCompatibilityService;
+    private final CodeChurnHotspotService churnHotspotService;
 
     public AdvancedAnalyticsService(
             BugRepository bugRepository,
@@ -22,13 +26,21 @@ public class AdvancedAnalyticsService {
             SpectrumFaultLocalizationService sbflService,
             TaintAndCallGraphService taintService,
             PatchQualityAndAntiPatternService shieldService,
-            BlastRadiusService blastRadiusService) {
+            BlastRadiusService blastRadiusService,
+            MutationTestingService mutationService,
+            ConcurrencyDeadlockService concurrencyDeadlockService,
+            BinaryCompatibilityService binaryCompatibilityService,
+            CodeChurnHotspotService churnHotspotService) {
         this.bugRepository = bugRepository;
         this.compilerSandboxService = compilerSandboxService;
         this.sbflService = sbflService;
         this.taintService = taintService;
         this.shieldService = shieldService;
         this.blastRadiusService = blastRadiusService;
+        this.mutationService = mutationService;
+        this.concurrencyDeadlockService = concurrencyDeadlockService;
+        this.binaryCompatibilityService = binaryCompatibilityService;
+        this.churnHotspotService = churnHotspotService;
     }
 
     // AST Parser helper
@@ -402,5 +414,25 @@ public class AdvancedAnalyticsService {
         res.put("hazards", warnings);
         res.put("verdict", warnings.isEmpty() ? "Thread Safety Audit Passed" : "Concurrency Race Hazard Detected");
         return res;
+    }
+
+    // 20. Deterministic AST Mutation Testing (PIT-Style Mutation Score)
+    public MutationTestingService.MutationReport runMutationAnalysis(String code, String file) {
+        return mutationService.runMutationAnalysis(code, file);
+    }
+
+    // 21. Concurrency Deadlock & Wait-For Graph Analysis
+    public ConcurrencyDeadlockService.ConcurrencyReport runConcurrencySafety(String code, String file) {
+        return concurrencyDeadlockService.analyzeConcurrencySafety(code, file);
+    }
+
+    // 22. JLS Binary & Source Backwards Compatibility
+    public BinaryCompatibilityService.CompatibilityReport auditBinaryCompatibility(String orig, String patch) {
+        return binaryCompatibilityService.auditBinaryCompatibility(orig, patch);
+    }
+
+    // 23. McCabe Cyclomatic Complexity & Commit Churn Hotspot Prediction
+    public CodeChurnHotspotService.HotspotReport analyzeRepositoryHotspots(String code, String file) {
+        return churnHotspotService.analyzeRepositoryHotspots(code, file);
     }
 }
